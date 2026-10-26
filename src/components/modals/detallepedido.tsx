@@ -22,15 +22,15 @@ export const PedidoDetalleModal: React.FC<Props> = ({ isOpen, onClose, pedido })
   if (!isOpen || !pedido) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 select-none">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[560px] overflow-hidden border border-gray-200">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 select-none">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[560px] overflow-hidden border border-sky-100">
         
-        {/* Cabecera del Modal */}
-        <div className="bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-          <span className="font-bold text-sm text-gray-900">Papelink</span>
+        {/* Cabecera del Modal con fondo celeste suave */}
+        <div className="bg-sky-50/80 border-b border-sky-100 px-6 py-4 flex justify-between items-center">
+          <span className="font-extrabold text-sm text-sky-800">Papelink</span>
           <button
             onClick={onClose}
-            className="w-7 h-7 bg-gray-800 hover:bg-black text-white rounded-md flex items-center justify-center text-xs transition"
+            className="w-7 h-7 bg-sky-700 hover:bg-sky-800 text-white rounded-lg flex items-center justify-center text-xs transition cursor-pointer"
           >
             ✕
           </button>
@@ -41,35 +41,35 @@ export const PedidoDetalleModal: React.FC<Props> = ({ isOpen, onClose, pedido })
           {/* Título y Estado */}
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-extrabold text-gray-900">Pedido : {pedido.id}</h2>
-              <p className="text-xs text-gray-500 mt-1">
-                Del usuario {pedido.cliente} con contacto (~{pedido.contacto})
+              <h2 className="text-xl font-extrabold text-slate-900">Pedido : {pedido.id}</h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Del usuario <span className="font-semibold text-slate-800">{pedido.cliente}</span> con contacto (~{pedido.contacto})
               </p>
             </div>
-            <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+            <span className="text-xs font-bold text-sky-800 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
               Estado : {pedido.estado}
             </span>
           </div>
 
-          {/* Fechas */}
-          <div className="space-y-1 text-xs text-gray-600">
-            <p>Pedido hecho el día {pedido.fechaPedido}</p>
-            <p>Fecha de entrega {pedido.fechaEntrega}</p>
+          {/* Fechas en bloque celeste tenue */}
+          <div className="space-y-1 text-xs text-slate-600 bg-sky-50/50 p-3.5 rounded-xl border border-sky-100/70">
+            <p>Pedido hecho el día <span className="font-semibold text-slate-900">{pedido.fechaPedido}</span></p>
+            <p>Fecha de entrega <span className="font-semibold text-slate-900">{pedido.fechaEntrega}</span></p>
           </div>
 
           {/* Lista de productos solicitados */}
-          <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-2">
-            <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase block">
+          <div className="bg-gradient-to-br from-sky-50/60 to-white border border-sky-200/80 rounded-xl p-4 space-y-2 shadow-2xs">
+            <span className="text-[10px] font-extrabold tracking-widest text-sky-700 uppercase block">
               LISTA DE PRODUCTOS SOLICITADOS
             </span>
             <div className="flex justify-between items-end pt-1">
               <div>
-                <p className="font-bold text-sm text-gray-900">{pedido.articulosResumen}</p>
-                <p className="text-xs text-gray-500">{pedido.articulosCount} artículos</p>
+                <p className="font-bold text-sm text-slate-900">{pedido.articulosResumen}</p>
+                <p className="text-xs text-sky-600 font-semibold">{pedido.articulosCount} artículos</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-gray-500 mr-1">Total:</span>
-                <span className="text-lg font-extrabold text-gray-900">${pedido.total.toFixed(2)}</span>
+                <span className="text-xs text-slate-500 mr-1.5 font-medium">Total:</span>
+                <span className="text-xl font-extrabold text-sky-700">${pedido.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -78,7 +78,7 @@ export const PedidoDetalleModal: React.FC<Props> = ({ isOpen, onClose, pedido })
           <div className="grid grid-cols-2 gap-3 pt-2">
             <button
               onClick={onClose}
-              className="py-2.5 px-4 border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 transition text-center"
+              className="py-2.5 px-4 border border-sky-200 rounded-xl text-xs font-semibold text-sky-800 bg-white hover:bg-sky-50 transition text-center cursor-pointer"
             >
               — Cancelar Pedido
             </button>
@@ -87,7 +87,7 @@ export const PedidoDetalleModal: React.FC<Props> = ({ isOpen, onClose, pedido })
                 alert(`Pedido ${pedido.id} marcado como completado.`);
                 onClose();
               }}
-              className="py-2.5 px-4 bg-[#2F3430] hover:bg-black text-white rounded-xl text-xs font-semibold transition text-center shadow-sm"
+              className="py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold transition text-center shadow-xs cursor-pointer"
             >
               + Registrar como completado
             </button>
