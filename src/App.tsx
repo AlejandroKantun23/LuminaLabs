@@ -22,13 +22,13 @@ export const App: React.FC = () => {
   }
 
   if (screen === 'login') {
-    return <Login onLogin={() => setScreen('dashboard')} />;
+    return <Login onLogin={() => {
+      setScreen('dashboard');
+      setCurrentView('inicio'); // Garantiza redirigir al Inicio
+    }} />;
   }
 
   return (
-    
-
-    
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Navbar
         setScreen={(nextScreen) => {

@@ -26,11 +26,9 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
     setCart(cart.filter(item => item.id !== id));
   };
 
-  const totalCalculated = cart.reduce((sum, item) => sum + (item.qty * item.price), 0);
-
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-[calc(100vh-4rem)] select-none">
-      {/* Cabecera de la vista */}
+      {/* Encabezado */}
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Inicio</h1>
@@ -44,12 +42,12 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
         </button>
       </div>
 
-      {/* Tarjetas de Estadísticas Superiores */}
+      {/* Tarjetas de Estadísticas */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white border border-gray-200/80 p-5 rounded-xl shadow-sm">
           <span className="text-[11px] text-gray-500 font-medium block mb-1">Ventas de hoy</span>
           <span className="text-2xl font-bold text-gray-900">$8,860.00</span>
-          <span className="text-[10px] text-gray-400 block mt-1">MXN - 12 ventas registradas</span>
+          <span className="text-[10px] text-gray-400 block mt-1">MXN · 12 ventas registradas</span>
         </div>
         <div className="bg-white border border-gray-200/80 p-5 rounded-xl shadow-sm">
           <span className="text-[11px] text-gray-500 font-medium block mb-1">Artículos en inventario</span>
@@ -63,18 +61,17 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
         </div>
       </div>
 
-      {/* Contenido Principal Grid (Productos + Últimas Ventas) */}
+      {/* Grid Principal */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Tabla de Productos / Carrito (8 columnas) */}
+        {/* Tabla de Productos / Carrito */}
         <div className="col-span-8 bg-white border border-gray-200/80 rounded-xl shadow-sm p-6 space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-bold text-sm text-gray-900">Productos</h3>
-            <span className="text-[11px] text-gray-400">Precios en MXN</span>
           </div>
 
-          {/* Filtros de Buscador y Estado */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          {/* Buscador de Producto y Campo de Cantidad */}
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-8">
               <label className="block text-[11px] font-semibold text-gray-600 mb-1">Buscar producto</label>
               <div className="relative flex items-center">
                 <span className="absolute left-3 text-gray-400">
@@ -89,17 +86,18 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Estado de stock</label>
-              <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 focus:outline-none focus:border-gray-400">
-                <option>Todos los estados</option>
-                <option>Stock normal</option>
-                <option>Stock bajo</option>
-              </select>
+
+            <div className="col-span-4">
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">Cantidad</label>
+              <input
+                type="text"
+                placeholder="Cantidad"
+                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400"
+              />
             </div>
           </div>
 
-          {/* Tabla */}
+          {/* Tabla de Productos */}
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-gray-100 text-gray-400 text-[11px]">
@@ -123,7 +121,7 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
                   <td className="py-3.5 text-right">
                     <button
                       onClick={() => handleRemove(item.id)}
-                      className="text-xs text-red-600 hover:underline font-medium"
+                      className="text-xs text-gray-900 hover:underline font-medium"
                     >
                       Eliminar
                     </button>
@@ -132,13 +130,9 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
               ))}
             </tbody>
           </table>
-          <div className="flex justify-end border-t border-gray-100 pt-4">
-            <span className="text-xs font-semibold text-gray-600 mr-3">Total del carrito</span>
-            <span className="text-sm font-bold text-gray-900">${totalCalculated.toFixed(2)} MXN</span>
-          </div>
         </div>
 
-        {/* Panel Lateral: Últimas Ventas (4 columnas) */}
+        {/* Panel Lateral: Últimas ventas */}
         <div className="col-span-4 bg-white border border-gray-200/80 rounded-xl shadow-sm p-6 flex flex-col justify-between">
           <div className="space-y-4">
             <div>
