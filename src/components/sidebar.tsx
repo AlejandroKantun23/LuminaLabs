@@ -1,16 +1,19 @@
-import React from 'react';
+import React from "react";
 
 interface SidebarProps {
   currentView: string;
   setCurrentView: (view: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentView,
+  setCurrentView,
+}) => {
   const menuItems = [
-    { id: 'inicio', label: 'Inicio' },
-    { id: 'inventario', label: 'Inventario' },
-    { id: 'ventas', label: 'Ventas' },
-    { id: 'pedidos', label: 'Pedidos' },
+    { id: "inicio", label: "Inicio" },
+    { id: "inventario", label: "Inventario" },
+    { id: "ventas", label: "Ventas" },
+    { id: "pedidos", label: "Pedidos" },
   ];
 
   return (
@@ -25,8 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             onClick={() => setCurrentView(item.id)}
             className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               currentView === item.id
-                ? 'bg-sky-600 text-white shadow-xs font-bold'
-                : 'text-slate-600 hover:bg-sky-50 hover:text-sky-700'
+                ? "bg-sky-600 text-white shadow-xs font-bold"
+                : "text-slate-600 hover:bg-sky-50 hover:text-sky-700"
             }`}
           >
             {item.label}

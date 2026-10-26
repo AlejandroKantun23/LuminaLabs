@@ -1,14 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export const Ventas: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'hoy' | 'semana' | 'mes'>('hoy');
+  const [activeTab, setActiveTab] = useState<"hoy" | "semana" | "mes">("hoy");
 
   const salesHistory = [
-    { id: 'V-00125', date: '14/10/2026', time: '13:06 h', itemsSummary: '3 cuadernos, 2 tijeras', itemCount: 5, total: 185.00, status: 'Completada' },
-    { id: 'V-00124', date: '14/10/2026', time: '12:24 h', itemsSummary: '6 carpetas, 2 lápices', itemCount: 8, total: 120.00, status: 'Completada' },
-    { id: 'V-00123', date: '14/10/2026', time: '11:47 h', itemsSummary: '12 pegamentos en barra', itemCount: 12, total: 264.00, status: 'Completada' },
-    { id: 'V-00122', date: '14/10/2026', time: '10:32 h', itemsSummary: '3 tijeras escolares', itemCount: 3, total: 75.00, status: 'Completada' },
-    { id: 'V-00121', date: '14/10/2026', time: '09:15 h', itemsSummary: '1 resma de papel, 5 lápices', itemCount: 6, total: 125.00, status: 'Completada' },
+    {
+      id: "V-00125",
+      date: "14/10/2026",
+      time: "13:06 h",
+      itemsSummary: "3 cuadernos, 2 tijeras",
+      itemCount: 5,
+      total: 185.0,
+      status: "Completada",
+    },
+    {
+      id: "V-00124",
+      date: "14/10/2026",
+      time: "12:24 h",
+      itemsSummary: "6 carpetas, 2 lápices",
+      itemCount: 8,
+      total: 120.0,
+      status: "Completada",
+    },
+    {
+      id: "V-00123",
+      date: "14/10/2026",
+      time: "11:47 h",
+      itemsSummary: "12 pegamentos en barra",
+      itemCount: 12,
+      total: 264.0,
+      status: "Completada",
+    },
+    {
+      id: "V-00122",
+      date: "14/10/2026",
+      time: "10:32 h",
+      itemsSummary: "3 tijeras escolares",
+      itemCount: 3,
+      total: 75.0,
+      status: "Completada",
+    },
+    {
+      id: "V-00121",
+      date: "14/10/2026",
+      time: "09:15 h",
+      itemsSummary: "1 resma de papel, 5 lápices",
+      itemCount: 6,
+      total: 125.0,
+      status: "Completada",
+    },
   ];
 
   return (
@@ -17,26 +57,44 @@ export const Ventas: React.FC = () => {
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">Ventas</h1>
-          <p className="text-xs text-sky-700 font-semibold mt-0.5">Consulta y registra las ventas de tu papelería.</p>
+          <p className="text-xs text-sky-700 font-semibold mt-0.5">
+            Consulta y registra las ventas de tu papelería.
+          </p>
         </div>
       </div>
 
       {/* Tarjetas de Estadísticas */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas de hoy</span>
-          <span className="text-2xl font-extrabold text-slate-900">$1,248.00</span>
-          <span className="text-[10px] text-sky-600 font-medium block mt-1">MXN · 14 de octubre de 2026</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ventas de hoy
+          </span>
+          <span className="text-2xl font-extrabold text-slate-900">
+            $1,248.00
+          </span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            MXN · 14 de octubre de 2026
+          </span>
         </div>
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas registradas</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ventas registradas
+          </span>
           <span className="text-2xl font-extrabold text-slate-900">8</span>
-          <span className="text-[10px] text-sky-600 font-medium block mt-1">52 artículos vendidos hoy</span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            52 artículos vendidos hoy
+          </span>
         </div>
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ticket promedio</span>
-          <span className="text-2xl font-extrabold text-slate-900">$156.00</span>
-          <span className="text-[10px] text-sky-600 font-medium block mt-1">MXN por venta de hoy</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ticket promedio
+          </span>
+          <span className="text-2xl font-extrabold text-slate-900">
+            $156.00
+          </span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            MXN por venta de hoy
+          </span>
         </div>
       </div>
 
@@ -44,27 +102,31 @@ export const Ventas: React.FC = () => {
       <div className="bg-white border border-sky-100 rounded-2xl shadow-xs p-6 space-y-4">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-bold text-sm text-slate-900">Registro de ventas</h3>
-            <p className="text-[10px] text-sky-700 font-medium mt-0.5">14 de octubre de 2026 · Más recientes primero</p>
+            <h3 className="font-bold text-sm text-slate-900">
+              Registro de ventas
+            </h3>
+            <p className="text-[10px] text-sky-700 font-medium mt-0.5">
+              14 de octubre de 2026 · Más recientes primero
+            </p>
           </div>
-          
+
           {/* Pestañas Celestes */}
           <div className="bg-sky-50/80 p-1 rounded-xl flex text-xs border border-sky-200/60">
             <button
-              onClick={() => setActiveTab('hoy')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'hoy' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}
+              onClick={() => setActiveTab("hoy")}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === "hoy" ? "bg-sky-600 text-white shadow-xs" : "text-slate-600 hover:text-sky-700"}`}
             >
               Hoy
             </button>
             <button
-              onClick={() => setActiveTab('semana')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'semana' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}
+              onClick={() => setActiveTab("semana")}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === "semana" ? "bg-sky-600 text-white shadow-xs" : "text-slate-600 hover:text-sky-700"}`}
             >
               Esta semana
             </button>
             <button
-              onClick={() => setActiveTab('mes')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'mes' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}
+              onClick={() => setActiveTab("mes")}
+              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === "mes" ? "bg-sky-600 text-white shadow-xs" : "text-slate-600 hover:text-sky-700"}`}
             >
               Este mes
             </button>
@@ -74,11 +136,23 @@ export const Ventas: React.FC = () => {
         {/* Inputs de Filtro */}
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">Buscar venta</label>
+            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+              Buscar venta
+            </label>
             <div className="relative flex items-center">
               <span className="absolute left-3 text-sky-500">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </span>
               <input
@@ -89,7 +163,9 @@ export const Ventas: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">Desde</label>
+            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+              Desde
+            </label>
             <input
               type="text"
               defaultValue="14/10/2026"
@@ -97,7 +173,9 @@ export const Ventas: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">Hasta</label>
+            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+              Hasta
+            </label>
             <input
               type="text"
               defaultValue="14/10/2026"
@@ -120,17 +198,26 @@ export const Ventas: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-sky-50">
             {salesHistory.map((s) => (
-              <tr key={s.id} className="text-slate-800 hover:bg-sky-50/50 transition">
+              <tr
+                key={s.id}
+                className="text-slate-800 hover:bg-sky-50/50 transition"
+              >
                 <td className="py-3.5 font-bold text-sky-700">{s.id}</td>
                 <td className="py-3.5 text-slate-500">
                   <div>{s.date}</div>
                   <div className="text-[10px] text-slate-400">{s.time}</div>
                 </td>
                 <td className="py-3.5">
-                  <div className="font-bold text-slate-900">{s.itemsSummary}</div>
-                  <div className="text-[10px] text-slate-500">{s.itemCount} artículos</div>
+                  <div className="font-bold text-slate-900">
+                    {s.itemsSummary}
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    {s.itemCount} artículos
+                  </div>
                 </td>
-                <td className="py-3.5 font-bold text-slate-900">${s.total.toFixed(2)}</td>
+                <td className="py-3.5 font-bold text-slate-900">
+                  ${s.total.toFixed(2)}
+                </td>
                 <td className="py-3.5">
                   <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200 inline-block">
                     {s.status}
@@ -158,8 +245,12 @@ export const Ventas: React.FC = () => {
           <div className="flex items-center gap-2">
             <span>Página 1 de 1</span>
             <div className="flex gap-1">
-              <button className="border border-sky-200 rounded-lg px-2.5 py-1 text-sky-700 hover:bg-sky-50 cursor-pointer">&lt;</button>
-              <button className="border border-sky-200 rounded-lg px-2.5 py-1 text-sky-700 hover:bg-sky-50 cursor-pointer">&gt;</button>
+              <button className="border border-sky-200 rounded-lg px-2.5 py-1 text-sky-700 hover:bg-sky-50 cursor-pointer">
+                &lt;
+              </button>
+              <button className="border border-sky-200 rounded-lg px-2.5 py-1 text-sky-700 hover:bg-sky-50 cursor-pointer">
+                &gt;
+              </button>
             </div>
           </div>
         </div>
