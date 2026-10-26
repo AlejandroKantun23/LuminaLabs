@@ -166,16 +166,6 @@ export const InicioPOS: React.FC<Props> = ({ onOpenCobro }) => {
               </div>
             </div>
           </div>
-
-          <div className="pt-4 border-t border-gray-100">
-            <button
-              onClick={() => alert('Navegando a ventas del día...')}
-              className="text-xs font-semibold text-gray-900 hover:underline flex items-center gap-1"
-            >
-              <span>Ver ventas del día</span>
-              <span>→</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
