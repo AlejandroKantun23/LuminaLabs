@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 export const Ventas: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"hoy" | "semana" | "mes">("hoy");
 
   const salesHistory = [
     {
@@ -104,27 +103,6 @@ export const Ventas: React.FC = () => {
             <p className="text-[10px] text-gray-400 mt-0.5">
               14 de octubre de 2026 · Más recientes primero
             </p>
-          </div>
-          {/* Pestañas (Hoy, Esta semana, Este mes) */}
-          <div className="bg-gray-100 p-1 rounded-lg flex text-xs">
-            <button
-              onClick={() => setActiveTab("hoy")}
-              className={`px-3 py-1 rounded-md font-medium transition ${activeTab === "hoy" ? "bg-[#2F3430] text-white shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-            >
-              Hoy
-            </button>
-            <button
-              onClick={() => setActiveTab("semana")}
-              className={`px-3 py-1 rounded-md font-medium transition ${activeTab === "semana" ? "bg-[#2F3430] text-white shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-            >
-              Esta semana
-            </button>
-            <button
-              onClick={() => setActiveTab("mes")}
-              className={`px-3 py-1 rounded-md font-medium transition ${activeTab === "mes" ? "bg-[#2F3430] text-white shadow-sm" : "text-gray-600 hover:text-gray-900"}`}
-            >
-              Este mes
-            </button>
           </div>
         </div>
 
