@@ -8,6 +8,9 @@ import { Inventario } from './pages/inventario';
 import { Ventas } from './pages/ventas';
 import { EstadoNegocioModal } from './components/modals/agregarventa';
 import { EstadoInventarioModal } from './components/modals/agregarinventario';
+import { Pedidos } from './pages/pedidos';
+
+
 
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<'splash' | 'login' | 'dashboard'>('splash');
@@ -28,6 +31,8 @@ export const App: React.FC = () => {
     }} />;
   }
 
+  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Navbar
@@ -47,6 +52,8 @@ export const App: React.FC = () => {
             <Inventario onOpenAgregarProducto={() => setIsAgregarProductoOpen(true)} />
           )}
           {currentView === 'ventas' && <Ventas />}
+
+          {currentView === 'pedidos' && <Pedidos />}
         </main>
       </div>
 

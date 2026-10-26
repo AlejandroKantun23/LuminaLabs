@@ -3,7 +3,7 @@ import React, { useState } from "react";
 export const Ventas: React.FC = () => {
 
   const salesHistory = [
-    {
+    {    
       id: "V-00125",
       date: "14/10/2026",
       time: "13:06 h",
