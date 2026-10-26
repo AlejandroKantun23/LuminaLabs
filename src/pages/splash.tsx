@@ -1,38 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from "react";
 
 interface Props {
   onFinish: () => void;
 }
 
-export const Splash: React.FC<Props> = ({ onFinish }) => {
-  const [progress, setProgress] = useState(0);
-
+export const SplashPage: React.FC<Props> = ({ onFinish }) => {
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setTimeout(onFinish, 300);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 100);
-
-    return () => clearInterval(timer);
+    const timer = setTimeout(() => {
+      onFinish();
+    }, 2200); // Tiempo de duración del splash
+    return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 select-none">
-      <div className="w-48 h-48 rounded-full bg-gray-300 border-4 border-gray-400 flex flex-col items-center justify-center mb-10 shadow-inner">
-        <svg className="w-20 h-20 text-gray-600 mb-1" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 16.25V21h4.75l11.06-11.06-3.75-3.75z"/>
-        </svg>
-        <span className="font-extrabold text-gray-700 text-sm tracking-widest">PAPELINK</span>
-      </div>
-      <div className="w-64 bg-gray-200 border border-gray-300 h-4 rounded-sm overflow-hidden p-0.5">
-        <div className="bg-gray-600 h-full rounded-sm transition-all duration-100" style={{ width: `${progress}%` }} />
+    <div className="min-h-screen bg-gradient-to-br from-[#EAF2F8] via-white to-[#E0F2FE] flex flex-col items-center justify-center p-4 select-none">
+      <div className="text-center space-y-4">
+        {/* Icono de la Papelería / Sistema con fondo azul formal */}
+        <div className="w-20 h-20 bg-sky-600 rounded-2xl mx-auto flex items-center justify-center shadow-md shadow-sky-200">
+          <svg
+            className="w-10 h-10 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.5"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            />
+          </svg>
+        </div>
+
+        {/* Título de la App */}
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          Papelink
+        </h1>
+        <p className="text-xs text-sky-700 font-bold tracking-wider uppercase">
+          Lumina Labs · Sistema POS
+        </p>
+
+        {/* Barra de carga sutil */}
+        <div className="pt-6">
+          <div className="w-32 h-1.5 bg-sky-100 rounded-full mx-auto overflow-hidden">
+            <div className="w-full h-full bg-sky-600 animate-pulse rounded-full"></div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+export default SplashPage;
