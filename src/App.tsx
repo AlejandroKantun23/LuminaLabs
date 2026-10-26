@@ -10,11 +10,10 @@ import { EstadoNegocioModal } from './components/modals/agregarventa';
 import { EstadoInventarioModal } from './components/modals/agregarinventario';
 import { Pedidos } from './pages/pedidos';
 
-
-
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<'splash' | 'login' | 'dashboard'>('splash');
   const [currentView, setCurrentView] = useState<string>('Inicio');
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // menú lateral en celular
 
   // Control de Modales
   const [isCobroOpen, setIsCobroOpen] = useState(false);
@@ -31,11 +30,11 @@ export const App: React.FC = () => {
     }} />;
   }
 
-  
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Navbar
+        isMenuOpen={isMenuOpen}
+        onToggleMenu={() => setIsMenuOpen((prev) => !prev)}
         setScreen={(nextScreen) => {
           if (nextScreen === 'splash' || nextScreen === 'login' || nextScreen === 'dashboard') {
             setScreen(nextScreen);
@@ -43,8 +42,13 @@ export const App: React.FC = () => {
         }}
       />
       <div className="flex flex-1">
-        <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
-        <main className="flex-1 bg-gray-50 overflow-y-auto">
+        <Sidebar
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+        <main className="flex-1 min-w-0 bg-gray-50 overflow-y-auto">
           {currentView === 'inicio' && (
             <Inicio onOpenCobro={() => setIsCobroOpen(true)} />
           )}
@@ -71,10 +75,7 @@ export const App: React.FC = () => {
         onClose={() => setIsAgregarProductoOpen(false)}
       />
     </div>
-
-    
   );
-  
 };
 
 export default App;

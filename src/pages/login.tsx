@@ -17,7 +17,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-[#F0F4F8] flex flex-col justify-between font-sans text-gray-800 select-none">
       {/* Barra Superior Header */}
-      <header className="h-16 bg-white border-b border-blue-100 px-8 flex items-center justify-between shadow-xs">
+      <header className="h-16 bg-white border-b border-blue-100 px-4 sm:px-8 flex items-center justify-between shadow-xs">
         <h1 className="text-xl font-bold tracking-tight text-blue-600">
           Papelink
         </h1>
@@ -28,13 +28,13 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
 
       {/* Tarjeta Central de Login */}
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-md border border-blue-100 p-8">
+        <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-md border border-blue-100 p-6 sm:p-8">
           {/* Encabezado de la Tarjeta */}
           <div className="mb-6">
             <span className="text-[10px] font-bold tracking-widest text-blue-500 uppercase block mb-1">
               ACCESO ADMINISTRATIVO
             </span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Inicia sesión
             </h2>
             <p className="text-xs text-gray-500 leading-relaxed">
@@ -47,7 +47,10 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Campo Correo Electrónico */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              <label
+                htmlFor="login-email"
+                className="block text-xs font-semibold text-gray-700 mb-1.5"
+              >
                 Correo electrónico
               </label>
               <div className="relative flex items-center">
@@ -67,6 +70,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
                   </svg>
                 </span>
                 <input
+                  id="login-email"
                   type="email"
                   required
                   value={email}
@@ -79,7 +83,10 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
 
             {/* Campo Contraseña */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              <label
+                htmlFor="login-password"
+                className="block text-xs font-semibold text-gray-700 mb-1.5"
+              >
                 Contraseña
               </label>
               <div className="relative flex items-center">
@@ -99,6 +106,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
                   </svg>
                 </span>
                 <input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
@@ -109,6 +117,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   className="absolute right-3.5 text-gray-400 hover:text-blue-600 focus:outline-none"
                 >
                   <svg
@@ -184,7 +193,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
       </main>
 
       {/* Pie de página Footer */}
-      <footer className="px-8 py-4 text-[11px] text-gray-400 space-y-0.5 bg-white border-t border-blue-50">
+      <footer className="px-4 sm:px-8 py-4 text-[11px] text-gray-400 space-y-0.5 bg-white border-t border-blue-50">
         <div>© 2026 Papelink</div>
         <div>Administración de tu papelería</div>
       </footer>

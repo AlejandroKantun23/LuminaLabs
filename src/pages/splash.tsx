@@ -33,7 +33,7 @@ export const Splash: React.FC<Props> = ({ onFinish }) => {
       </div>
 
       {/* Barra de carga en tonos celestes */}
-      <div className="w-64 bg-white border border-sky-200 h-4 rounded-full overflow-hidden p-0.5 shadow-xs">
+      <div className="w-full max-w-[16rem] bg-white border border-sky-200 h-4 rounded-full overflow-hidden p-0.5 shadow-xs">
         <div className="bg-sky-600 h-full rounded-full transition-all duration-100" style={{ width: `${progress}%` }} />
       </div>
     </div>

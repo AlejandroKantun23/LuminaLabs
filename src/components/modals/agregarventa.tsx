@@ -23,12 +23,17 @@ export const EstadoNegocioModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 bg-blue-950/30 backdrop-blur-xs flex items-center justify-center z-50 p-4 select-none">
-      <div className="bg-white rounded-2xl shadow-xl w-[450px] p-6 relative border border-blue-100">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Estado del negocio"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-[450px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative border border-blue-100"
+      >
         <div className="text-center font-bold text-blue-900 mb-2 text-xs uppercase tracking-wider">
           Estado del Negocio
         </div>
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
           <div className="flex-1 bg-blue-50/60 border border-blue-100 rounded-xl p-4 text-center">
             <span className="text-xs text-blue-600 font-medium block mb-1">
               Total a cobrar
@@ -37,7 +42,7 @@ export const EstadoNegocioModal: React.FC<Props> = ({
               ${totalAmount.toFixed(2)}
             </span>
           </div>
-          <div className="w-28 bg-blue-50/60 border border-blue-100 rounded-xl p-4 text-center flex flex-col justify-center">
+          <div className="w-full sm:w-28 bg-blue-50/60 border border-blue-100 rounded-xl p-4 text-center flex flex-col justify-center">
             <span className="text-[10px] text-blue-600 font-medium leading-tight mb-1">
               Total de Artículos
             </span>
@@ -49,8 +54,11 @@ export const EstadoNegocioModal: React.FC<Props> = ({
 
         <div className="space-y-3 mb-6">
           <div className="flex justify-between items-center text-xs font-semibold">
-            <span className="text-gray-600">Pago Con $</span>
+            <label htmlFor="pago-con" className="text-gray-600">
+              Pago Con $
+            </label>
             <input
+              id="pago-con"
               type="number"
               value={payment}
               onChange={(e) => setPayment(Number(e.target.value))}
@@ -65,10 +73,10 @@ export const EstadoNegocioModal: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 cursor-pointer"
+            className="px-4 py-2.5 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 cursor-pointer"
           >
             Cancelar
           </button>
@@ -77,7 +85,7 @@ export const EstadoNegocioModal: React.FC<Props> = ({
               onConfirmSale();
               onClose();
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer"
           >
             Cobrar e Imprimir Ticket
           </button>
