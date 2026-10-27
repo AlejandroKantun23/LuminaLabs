@@ -1,32 +1,67 @@
-# React + TypeScript + Vite
+# Papelink
+Sistema dual de gestión para papelería (Panel web de administración/POS y App móvil para clientes) desarrollado por el equipo **Luminalabs** para la Universidad Tecnológica de Cancún.
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Equipo
+-Arizmendi Reyes Ángel de Jesús  
+-Loria Gil Carlos Said  
+-Kantún Mukul José Alejandro  
+-Peraza Cupul Luis Ángel
 
-Currently, two official plugins are available:
+## 1. Problema Identificado
+La papelería opera de forma manual con libretas y bitácoras físicas. Esto provoca falta de control en el stock, mermas por productos agotados y tiempos muertos atendiendo consultas de precios y existencias por mensajes. **Papelink** automatiza el inventario, permite a los clientes apartar productos desde el celular y ayuda al cajero a gestionar ventas rápidas.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 2. Flujo Seleccionado y Mapa de Navegación
+El proceso se divide en 4 caminos interconectados entre la app y la web:
+* **Camino A:** Acceso y sesiones de usuario.
+* **Camino B:** Consulta de catálogo móvil y apartado de productos por parte del cliente.
+* **Camino C:** Venta en mostrador y atención de reservas por el cajero.
+* **Camino D:** Control de inventario y alertas automáticas de stock bajo.
 
-## React Compiler
+## 3. Lista de Interfaces
+* **Aplicación Web (Administración):**
+  * Pantalla de carga y Inicio de sesión.
+  * Dashboard / Inicio (Indicadores, métricas y últimas ventas).
+  * Inventario (Catálogo, filtros y alertas de stock).
+  * Ventas (Historial con filtros por fecha) y Registrar venta (POS/Cobro).
+  * Pedidos (Gestión de apartados móviles).
+* **Aplicación Móvil (Cliente):**
+  * Catálogo de productos, buscador y estados de disponibilidad.
+  * Modal de selección de cantidad y Carrito de compras.
+  * Confirmación de apartado de pedido.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 4. Bocetos y Prototipo
+* **Bocetos de diseño:** Disponibles en la carpeta "docs/mockups/" del proyecto.
+* **Evidencia del prototipo frontend:** Interfaces maquetadas e interactivas corriendo con datos ficticios en React y Flutter.
 
-## Expanding the Oxlint configuration
+## 5. Tecnologías
+* **Frontend Web:** React, TypeScript, Vite, Tailwind CSS, React Router.
+* **Móvil:** Flutter (Dart).
+* **Control de versiones:** Git / GitHub.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 6. Estructura del Proyecto
+```text
+frontend/  
+├── src/  
+│   ├── assets/          # Recursos gráficos e imágenes  
+│   ├── components/      # Componentes reutilizables (Botones, Modales, Tablas)  
+│   ├── context/         # Estados globales (Auth y Carrito)  
+│   ├── pages/           # Vistas (Dashboard, Inventario, Ventas, Pedidos)  
+│   ├── services/        # Capa de datos ficticios (simulación de API)  
+│   ├── types/           # Interfaces TypeScript (Product, Sale, Order)  
+│   └── App.tsx          # Enrutador principal  
+├── tailwind.config.js   # Configuración de estilos  
+└── package.json
 ```
+# 1. Clonar el repositorio
+git clone [https://github.com/AlejandroKantun23/LuminaLabs.git](https://github.com/AlejandroKantun23/LuminaLabs.git)  
+cd LuminaLabs  
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+# 2. Ejecutar la Aplicación Web (Frontend)
+cd frontend  
+npm install  
+npm run dev   - Abre en http://localhost:5173
+
+# 3. Ejecutar la Aplicación Móvil (Flutter)  
+cd ../papelink_mobile  
+flutter pub get  
+flutter run
