@@ -15,7 +15,7 @@ export const EstadoNegocioModal: React.FC<Props> = ({
   totalItems,
   onConfirmSale,
 }) => {
-  const [payment, setPayment] = useState<number>(200);
+  const [payment, setPayment] = useState<number>(0);
 
   if (!isOpen) return null;
 
