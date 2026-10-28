@@ -66,6 +66,28 @@ export const VentaDetalleModal: React.FC<Props> = ({ isOpen, onClose, sale }) =>
             </div>
           </div>
 
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 select-none">
+  <div className="bg-white rounded-2xl shadow-xl w-full max-w-[450px] max-h-[90vh] overflow-y-auto p-5 sm:p-6 border border-sky-100">
+    
+    {/* Distribución interna adaptable */}
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+      <div className="flex-1 bg-sky-50/60 border border-sky-100 rounded-xl p-4 text-center">
+        {/* Total a cobrar */}
+      </div>
+      <div className="w-full sm:w-28 bg-sky-50/60 border border-sky-100 rounded-xl p-4 text-center">
+        {/* Total artículos */}
+      </div>
+    </div>
+
+    {/* Botones de acción inferiores */}
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+      <button className="px-4 py-2.5 border border-sky-200 text-sky-800 text-xs font-semibold rounded-xl hover:bg-sky-50">Cancelar</button>
+      <button className="px-4 py-2.5 bg-sky-600 text-white text-xs font-semibold rounded-xl shadow-xs">Cobrar e Imprimir Ticket</button>
+    </div>
+
+  </div>
+</div>
+
           {/* Botón de Cerrar */}
           <div className="flex justify-end pt-2">
             <button

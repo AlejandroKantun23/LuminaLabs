@@ -176,6 +176,31 @@ export const Ventas: React.FC = () => {
         </div>
       </div>
 
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <div>
+    <h3 className="font-bold text-sm text-slate-900">Registro de ventas</h3>
+    <p className="text-[10px] text-sky-700 font-medium mt-0.5">14 de octubre de 2026 · Más recientes primero</p>
+  </div>
+  
+  {/* Pestañas adaptables */}
+  <div className="bg-sky-50/80 p-1 rounded-xl flex text-xs border border-sky-200/60 overflow-x-auto max-w-full">
+    <button className="px-3 py-1.5 rounded-lg font-bold transition">Hoy</button>
+    <button className="px-3 py-1.5 rounded-lg font-bold transition">Esta semana</button>
+    <button className="px-3 py-1.5 rounded-lg font-bold transition">Este mes</button>
+  </div>
+</div>
+
+{/* Inputs de filtro de fecha */}
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  {/* Inputs de búsqueda, desde y hasta */}
+</div>
+
+<div className="overflow-x-auto mt-4">
+  <table className="w-full text-left text-xs border-collapse min-w-[600px]">
+    {/* Tabla de ventas */}
+  </table>
+</div>
+
       {/* Modal Flotante de Detalle de Venta */}
       <VentaDetalleModal
         isOpen={isModalOpen}
