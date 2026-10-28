@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { VentaDetalleModal } from '../components/modals/detalleventa';
+import { DetalleVentaModal } from '../components/modals/detalleventa';
 
 export const Ventas: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hoy' | 'semana' | 'mes'>('hoy');
@@ -202,7 +202,7 @@ export const Ventas: React.FC = () => {
 </div>
 
       {/* Modal Flotante de Detalle de Venta */}
-      <VentaDetalleModal
+      <DetalleVentaModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         sale={selectedSale}
