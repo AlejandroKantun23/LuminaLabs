@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { login as authenticate, setToken } from "../api/client";
 
 interface Props {
   onLogin: () => void;
@@ -8,10 +9,30 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    setError("");
+    setIsSubmitting(true);
+    try {
+      const user = await authenticate(email, password);
+      if (user.rol === "cliente") {
+        setToken(null);
+        setError("Esta cuenta no tiene acceso al panel administrativo.");
+        return;
+      }
+      onLogin();
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "No se pudo iniciar sesión.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -45,6 +66,11 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <p role="alert" className="text-xs font-medium text-red-600">
+                {error}
+              </p>
+            )}
             {/* Campo Correo Electrónico */}
             <div>
               <label
@@ -157,9 +183,10 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
             <div className="pt-2">
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
-                <span>Iniciar sesión</span>
+                <span>{isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}</span>
                 <svg
                   className="w-4 h-4"
                   fill="none"

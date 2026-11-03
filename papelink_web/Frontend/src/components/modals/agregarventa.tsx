@@ -5,7 +5,9 @@ interface Props {
   onClose: () => void;
   totalAmount: number;
   totalItems: number;
-  onConfirmSale: () => void;
+  onConfirmSale: () => Promise<boolean>;
+  error?: string;
+  isSubmitting?: boolean;
 }
 
 export const EstadoNegocioModal: React.FC<Props> = ({
@@ -14,6 +16,8 @@ export const EstadoNegocioModal: React.FC<Props> = ({
   totalAmount,
   totalItems,
   onConfirmSale,
+  error = "",
+  isSubmitting = false,
 }) => {
   const [payment, setPayment] = useState<number>(0);
 
@@ -81,15 +85,19 @@ export const EstadoNegocioModal: React.FC<Props> = ({
             Cancelar
           </button>
           <button
-            onClick={() => {
-              onConfirmSale();
-              onClose();
+            disabled={isSubmitting}
+            onClick={async () => {
+              if (await onConfirmSale()) {
+                setPayment(0);
+                onClose();
+              }
             }}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer"
           >
-            Cobrar e Imprimir Ticket
+            {isSubmitting ? "Procesando..." : "Cobrar e Imprimir Ticket"}
           </button>
         </div>
+        {error && <p role="alert" className="mt-3 text-xs font-medium text-red-600">{error}</p>}
       </div>
     </div>
   );

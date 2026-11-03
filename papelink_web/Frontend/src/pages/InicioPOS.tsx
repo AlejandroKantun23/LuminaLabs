@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getCatalogo, getInventario, getResumenDia, getVentas } from '../api/client';
+import type { ProductoApi, ResumenDia, VentaApi } from '../api/client';
 
 interface Product {
+  productId: number;
   id: string;
   name: string;
   category: string;
@@ -8,7 +11,7 @@ interface Product {
   price: number;
 }
 
-interface CartItem extends Product {
+export interface CartItem extends Product {
   qty: number;
 }
 
@@ -16,30 +19,89 @@ interface Props {
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   onOpenCobro: () => void;
+  refreshKey: number;
 }
 
-const MOCK_CATALOG: Product[] = [
-  { id: 'CUA-100R', name: 'Cuaderno profesional', category: 'Cuadernos', details: 'Raya, 100 hojas', price: 45.00 },
-  { id: 'LAP-HB02', name: 'Lápiz de grafito HB', category: 'Escritura', details: 'No. 2', price: 6.00 },
-  { id: 'MAR-12C', name: 'Marcadores de colores', category: 'Arte', details: 'Estuche de 12 piezas', price: 68.00 },
-  { id: 'TIJ-13CM', name: 'Tijeras escolares', category: 'Escolar', details: 'Punta redonda', price: 25.00 },
-  { id: 'BOR-01B', name: 'Borrador de nata', category: 'Escritura', details: 'Libre de PVC', price: 10.00 },
-  { id: 'RES-500H', name: 'Resma de papel bond', category: 'Papelería', details: 'Tamaño carta, 500 hojas', price: 110.00 },
-];
-
-export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
+export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro, refreshKey }) => {
+  const [today] = useState(() => new Date());
   const [searchTerm, setSearchTerm] = useState('');
   const [quantity, setQuantity] = useState<number>(1);
+  const [filteredCatalog, setFilteredCatalog] = useState<Product[]>([]);
+  const [summary, setSummary] = useState<ResumenDia | null>(null);
+  const [recentSales, setRecentSales] = useState<VentaApi[]>([]);
+  const [inventoryResult, setInventoryResult] = useState<{
+    refreshKey: number;
+    products: ProductoApi[];
+    error: boolean;
+  } | null>(null);
+  const [error, setError] = useState('');
 
-  const filteredCatalog = searchTerm.trim() === '' 
-    ? [] 
-    : MOCK_CATALOG.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        p.id.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  useEffect(() => {
+    let active = true;
+    const query = searchTerm.trim();
+    if (!query) {
+      return () => { active = false; };
+    }
+
+    const timer = window.setTimeout(() => {
+      getCatalogo(query)
+        .then((products) => {
+          if (active) {
+            setFilteredCatalog(products.map((product: ProductoApi) => ({
+              productId: product.id,
+              id: product.sku ?? product.codigo_barras ?? String(product.id),
+              name: product.nombre,
+              category: product.categoria,
+              details: product.descripcion ?? '',
+              price: product.precio,
+            })));
+            setError('');
+          }
+        })
+        .catch((requestError: unknown) => {
+          if (active) setError(requestError instanceof Error ? requestError.message : 'No se pudo buscar el producto.');
+        });
+    }, 250);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getResumenDia(), getVentas()])
+      .then(([dailySummary, sales]) => {
+        if (active) {
+          setSummary(dailySummary);
+          setRecentSales(sales.slice(0, 3));
+        }
+      })
+      .catch((requestError: unknown) => {
+        if (active) setError(requestError instanceof Error ? requestError.message : 'No se pudo cargar el resumen.');
+      });
+    return () => { active = false; };
+  }, [refreshKey]);
+
+  useEffect(() => {
+    let active = true;
+    getInventario()
+      .then((products) => {
+        if (active) {
+          setInventoryResult({ refreshKey, products, error: false });
+        }
+      })
+      .catch((requestError: unknown) => {
+        if (active) {
+          setInventoryResult({ refreshKey, products: [], error: true });
+          setError(requestError instanceof Error ? requestError.message : 'No se pudo cargar el inventario.');
+        }
+      });
+    return () => { active = false; };
+  }, [refreshKey]);
 
   const handleAddProduct = (product: Product) => {
-    const existingIndex = cart.findIndex(item => item.id === product.id);
+    const existingIndex = cart.findIndex(item => item.productId === product.productId);
     if (existingIndex > -1) {
       const updatedCart = [...cart];
       updatedCart[existingIndex].qty += Number(quantity) || 1;
@@ -54,6 +116,19 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
   const handleRemove = (id: string) => {
     setCart(cart.filter(item => item.id !== id));
   };
+  const inventoryForCurrentRefresh = inventoryResult?.refreshKey === refreshKey
+    ? inventoryResult
+    : null;
+  const inventoryLoaded = inventoryForCurrentRefresh !== null && !inventoryForCurrentRefresh.error;
+  const inventoryError = inventoryForCurrentRefresh?.error === true;
+  const inventory = inventoryLoaded ? inventoryForCurrentRefresh.products : [];
+  const totalUnits = inventory.reduce((sum, product) => sum + product.stock, 0);
+  const lowStock = inventory.filter((product) =>
+    product.estatus === 'Stock bajo' || product.estatus === 'Sin existencias',
+  ).length;
+  const lowStockCount = inventory.filter((product) => product.estatus === 'Stock bajo').length;
+  const outOfStockCount = inventory.filter((product) => product.estatus === 'Sin existencias').length;
+  const formatTicket = (sale: VentaApi) => sale.ticket ?? `T-${String(sale.id).padStart(6, '0')}`;
 
   return (
     <div className="space-y-6">
@@ -61,7 +136,7 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">Inicio</h1>
-          <p className="text-xs text-sky-700 font-semibold mt-0.5">15/10/2026</p>
+          <p className="text-xs text-sky-700 font-semibold mt-0.5">{today.toLocaleDateString('es-MX')}</p>
         </div>
         <button
           onClick={onOpenCobro}
@@ -76,17 +151,26 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
           <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas de hoy</span>
-          <span className="text-2xl font-extrabold text-slate-900">$8,860.00</span>
+          <span className="text-2xl font-extrabold text-slate-900">${(summary?.ventas_hoy ?? 0).toFixed(2)}</span>
         </div>
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Artículos en inventario</span>
-          <span className="text-2xl font-extrabold text-slate-900">148</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">Unidades disponibles</span>
+          <span className="text-2xl font-extrabold text-slate-900">{inventoryError ? '—' : inventoryLoaded ? totalUnits : '...'}</span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            {inventoryError ? 'No se pudo cargar el inventario' : 'Existencias totales en inventario'}
+          </span>
         </div>
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
           <span className="text-[11px] text-sky-800 font-bold block mb-1">Existencias bajas</span>
-          <span className="text-2xl font-extrabold text-amber-600">3</span>
+          <span className="text-2xl font-extrabold text-amber-600">{inventoryError ? '—' : inventoryLoaded ? lowStock : '...'}</span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            {inventoryError
+              ? 'No se pudo cargar el inventario'
+              : `${lowStockCount} con stock bajo · ${outOfStockCount} sin existencias`}
+          </span>
         </div>
       </div>
+      {error && <p role="alert" className="text-xs font-medium text-red-600">{error}</p>}
 
       {/* Grid Principal */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -106,7 +190,10 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    if (!e.target.value.trim()) setFilteredCatalog([]);
+                  }}
                   placeholder="Nombre o modelo (ej. Cuaderno)"
                   className="w-full bg-sky-50/40 border border-sky-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
@@ -116,7 +203,7 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
                 <div className="absolute left-0 right-0 top-16 bg-white border border-sky-200 rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-sky-50">
                   {filteredCatalog.map((prod) => (
                     <div
-                      key={prod.id}
+                        key={prod.productId}
                       onClick={() => handleAddProduct(prod)}
                       className="p-3 hover:bg-sky-50 cursor-pointer flex justify-between items-center transition"
                     >
@@ -188,14 +275,14 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro }) => {
         <div className="lg:col-span-4 bg-gradient-to-b from-white to-sky-50/60 border border-sky-100 rounded-2xl shadow-xs p-6 flex flex-col justify-between">
           <h3 className="font-bold text-sm text-slate-900 mb-4">Últimas ventas</h3>
           <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center py-2 border-b border-sky-100">
-              <span>Venta #1048</span>
-              <span className="font-bold text-sky-700">$285.00</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-sky-100">
-              <span>Venta #1047</span>
-              <span className="font-bold text-sky-700">$156.00</span>
-            </div>
+            {recentSales.length === 0 ? (
+              <p className="py-2 text-slate-500">Aún no hay ventas registradas.</p>
+            ) : recentSales.map((sale) => (
+              <div key={sale.id} className="flex justify-between items-center py-2 border-b border-sky-100">
+                <span>Venta #{formatTicket(sale)}</span>
+                <span className="font-bold text-sky-700">${sale.total.toFixed(2)}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

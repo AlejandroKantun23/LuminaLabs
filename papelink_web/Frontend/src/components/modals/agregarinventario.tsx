@@ -1,11 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { actualizarProducto, crearProducto, getCategorias } from "../../api/client";
+import type { Categoria, ProductoApi } from "../../api/client";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onCreated: () => void;
+  product?: ProductoApi | null;
 }
 
-export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
+export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose, onCreated, product = null }) => {
+  const [categories, setCategories] = useState<Categoria[]>([]);
+  const [categoryId, setCategoryId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) return;
+    getCategorias()
+      .then((result) => {
+        setCategories(result);
+        const selectedCategory = product?.categoria_id
+          ?? result.find((category) => category.nombre === product?.categoria)?.id
+          ?? result[0]?.id;
+        setCategoryId(selectedCategory ? String(selectedCategory) : "");
+        setError("");
+      })
+      .catch((requestError: unknown) => {
+        setError(requestError instanceof Error ? requestError.message : "No se pudieron cargar las categorías.");
+      });
+  }, [isOpen, product]);
+
   if (!isOpen) return null;
 
   return (
@@ -22,9 +47,36 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
         <form
           className="space-y-3 text-xs"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            onClose();
+            setError("");
+            setIsSubmitting(true);
+            const form = new FormData(e.currentTarget);
+            try {
+            const code = String(form.get("sku") ?? "").trim();
+            const values = {
+              ...(product?.sku
+                ? { sku: code }
+                : product?.codigo_barras
+                ? { codigo_barras: code }
+                : { sku: code || undefined }),
+              nombre: String(form.get("nombre") ?? "").trim(),
+                precio: Number(form.get("precio")),
+                categoria_id: Number(categoryId),
+                stock: Number(form.get("stock")),
+                stock_minimo: Number(form.get("minimo")),
+              };
+              if (product) {
+                await actualizarProducto(product.id, values);
+              } else {
+                await crearProducto(values);
+              }
+              onCreated();
+            } catch (requestError) {
+              setError(requestError instanceof Error ? requestError.message : "No se pudo guardar el producto.");
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
         >
           <div>
@@ -33,8 +85,10 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </label>
             <input
               id="inv-codigo"
+              name="sku"
               type="text"
               placeholder="Ej: 750123456789"
+              defaultValue={product?.sku ?? product?.codigo_barras ?? ""}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
             />
           </div>
@@ -44,8 +98,11 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </label>
             <input
               id="inv-nombre"
+              name="nombre"
               type="text"
               placeholder="Ej: Cuaderno Profesional 100 hojas"
+              defaultValue={product?.nombre ?? ""}
+              required
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
             />
           </div>
@@ -56,8 +113,13 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
               </label>
               <input
                 id="inv-precio"
+                name="precio"
                 type="number"
+                min="0"
+                step="0.01"
                 placeholder="0.00"
+                defaultValue={product?.precio ?? ""}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
             </div>
@@ -67,11 +129,14 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
               </label>
               <select
                 id="inv-cat"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
               >
-                <option>Cuadernos</option>
-                <option>Escritura</option>
-                <option>Papel</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>{category.nombre}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -82,8 +147,12 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
               </label>
               <input
                 id="inv-stock"
+                name="stock"
                 type="number"
+                min="0"
                 placeholder="10"
+                defaultValue={product?.stock ?? 0}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
             </div>
@@ -93,12 +162,18 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
               </label>
               <input
                 id="inv-min"
+                name="minimo"
                 type="number"
+                min="0"
                 placeholder="5"
+                defaultValue={product?.stock_minimo ?? 5}
+                required
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
             </div>
           </div>
+
+          {error && <p role="alert" className="text-red-600">{error}</p>}
 
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4">
             <button
@@ -110,9 +185,10 @@ export const EstadoInventarioModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </button>
             <button
               type="submit"
+              disabled={isSubmitting || !categories.length}
               className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
             >
-              Guardar en Inventario
+              {isSubmitting ? "Guardando..." : product ? "Guardar cambios" : "Guardar en Inventario"}
             </button>
           </div>
         </form>

@@ -7,4 +7,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    // En desarrollo las llamadas a /api van al backend (evita CORS)
+    proxy: { '/api': 'http://localhost:3000' },
+  },
 })

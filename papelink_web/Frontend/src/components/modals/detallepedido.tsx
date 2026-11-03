@@ -2,11 +2,13 @@ import React from "react";
 
 interface Pedido {
   id: string;
+  backendId: number;
   cliente: string;
-  contacto: string;
+  contacto: string | null;
   fechaPedido: string;
   fechaEntrega: string;
   estado: string;
+  estadoApi: "pendiente" | "confirmado_apartado" | "listo_en_tienda" | "completado" | "cancelado";
   articulosResumen: string;
   articulosCount: number;
   total: number;
@@ -16,14 +18,40 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   pedido: Pedido | null;
+  onCancel: () => Promise<boolean>;
+  onAdvance: () => Promise<boolean>;
 }
 
 export const PedidoDetalleModal: React.FC<Props> = ({
   isOpen,
   onClose,
   pedido,
+  onCancel,
+  onAdvance,
 }) => {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [error, setError] = React.useState("");
   if (!isOpen || !pedido) return null;
+  const isActive = !["completado", "cancelado"].includes(pedido.estadoApi);
+  const advanceLabel = pedido.estadoApi === "pendiente"
+    ? "Confirmar apartado"
+    : pedido.estadoApi === "confirmado_apartado"
+    ? "Marcar listo en tienda"
+    : pedido.estadoApi === "listo_en_tienda"
+    ? "Cobrar y entregar"
+    : "Pedido finalizado";
+
+  const runAction = async (action: () => Promise<boolean>) => {
+    setIsSubmitting(true);
+    setError("");
+    try {
+      if (await action()) onClose();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "No se pudo actualizar el pedido.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 select-none">
@@ -58,7 +86,7 @@ export const PedidoDetalleModal: React.FC<Props> = ({
                 <span className="font-semibold text-slate-800">
                   {pedido.cliente}
                 </span>{" "}
-                con contacto (~{pedido.contacto})
+                con contacto (~{pedido.contacto ?? "No registrado"})
               </p>
             </div>
             <span className="self-start text-xs font-bold text-sky-800 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
@@ -110,21 +138,21 @@ export const PedidoDetalleModal: React.FC<Props> = ({
           {/* Botones de acción */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <button
-              onClick={onClose}
-              className="py-2.5 px-4 border border-sky-200 rounded-xl text-xs font-semibold text-sky-800 bg-white hover:bg-sky-50 transition text-center cursor-pointer"
+              disabled={!isActive || isSubmitting}
+              onClick={() => runAction(onCancel)}
+              className="py-2.5 px-4 border border-sky-200 rounded-xl text-xs font-semibold text-sky-800 bg-white hover:bg-sky-50 transition text-center cursor-pointer disabled:opacity-50"
             >
               — Cancelar Pedido
             </button>
             <button
-              onClick={() => {
-                alert(`Pedido ${pedido.id} marcado como completado.`);
-                onClose();
-              }}
-              className="py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold transition text-center shadow-xs cursor-pointer"
+              disabled={!isActive || isSubmitting}
+              onClick={() => runAction(onAdvance)}
+              className="py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold transition text-center shadow-xs cursor-pointer disabled:opacity-50"
             >
-              + Registrar como completado
+              {isSubmitting ? "Procesando..." : `+ ${advanceLabel}`}
             </button>
           </div>
+          {error && <p role="alert" className="text-xs font-medium text-red-600">{error}</p>}
         </div>
       </div>
     </div>

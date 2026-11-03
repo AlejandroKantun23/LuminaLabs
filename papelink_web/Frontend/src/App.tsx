@@ -1,12 +1,16 @@
 import React, { useState } from "react";
+import { crearVenta, setToken } from "./api/client";
+import type { ProductoApi } from "./api/client";
 import { Splash } from "./pages/splash";
 import { Login } from "./pages/login";
 import { InicioPOS } from "./pages/InicioPOS";
+import type { CartItem } from "./pages/InicioPOS";
 import { Inventario } from "./pages/inventario";
 import { Ventas } from "./pages/ventas";
 import { Pedidos } from "./pages/pedidos";
 import { Sidebar } from "./components/sidebar";
 import { EstadoNegocioModal } from "./components/modals/agregarventa";
+import { EstadoInventarioModal } from "./components/modals/agregarinventario";
 
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<"splash" | "login" | "dashboard">(
@@ -15,110 +19,50 @@ export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>("inicio");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCobroOpen, setIsCobroOpen] = useState(false);
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+  const [inventoryProduct, setInventoryProduct] = useState<ProductoApi | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [saleError, setSaleError] = useState("");
+  const [isSaleSubmitting, setIsSaleSubmitting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Carrito compartido de la pantalla de inicio
-  const [cart, setCart] = useState([
-    {
-      id: "CUA-100R",
-      name: "Cuaderno profesional",
-      category: "Cuadernos",
-      details: "Raya, 100 hojas",
-      price: 45.0,
-      qty: 4,
-    },
-    {
-      id: "LAP-HB02",
-      name: "Lápiz de grafito HB",
-      category: "Escritura",
-      details: "No. 2",
-      price: 6.0,
-      qty: 3,
-    },
-    {
-      id: "MAR-12C",
-      name: "Marcadores de colores",
-      category: "Arte",
-      details: "Estuche de 12 piezas",
-      price: 68.0,
-      qty: 1,
-    },
-    {
-      id: "TIJ-13CM",
-      name: "Tijeras escolares",
-      category: "Escolar",
-      details: "Punta redonda",
-      price: 25.0,
-      qty: 2,
-    },
-  ]);
-
-  // Historial global de ventas
-  const [salesList, setSalesList] = useState([
-    {
-      id: "V-00125",
-      date: "14/10/2026",
-      time: "13:06 h",
-      itemsSummary: "3 cuadernos, 2 tijeras",
-      itemCount: 5,
-      total: 185.0,
-      status: "Completada",
-    },
-    {
-      id: "V-00124",
-      date: "14/10/2026",
-      time: "12:24 h",
-      itemsSummary: "6 carpetas, 2 lápices",
-      itemCount: 8,
-      total: 120.0,
-      status: "Completada",
-    },
-    {
-      id: "V-00123",
-      date: "14/10/2026",
-      time: "11:47 h",
-      itemsSummary: "12 pegamentos en barra",
-      itemCount: 12,
-      total: 264.0,
-      status: "Completada",
-    },
-  ]);
-
-  // Cálculos dinámicos basados en el carrito actual
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.price * item.qty,
     0,
   );
   const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
 
-  const handleConfirmSale = () => {
-    if (cart.length === 0) return;
+  const handleConfirmSale = async () => {
+    if (!cart.length || isSaleSubmitting) return false;
+    setSaleError("");
+    setIsSaleSubmitting(true);
+    try {
+      await crearVenta(
+        cart.map((item) => ({
+          producto_id: item.productId,
+          cantidad: item.qty,
+        })),
+        "efectivo",
+      );
+      setCart([]);
+      setRefreshKey((key) => key + 1);
+      return true;
+    } catch (requestError) {
+      setSaleError(
+        requestError instanceof Error
+          ? requestError.message
+          : "No se pudo registrar la venta.",
+      );
+      return false;
+    } finally {
+      setIsSaleSubmitting(false);
+    }
+  };
 
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("es-MX", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const timeStr =
-      now.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" }) +
-      " h";
-
-    const summary = cart
-      .map((i) => `${i.qty} ${i.name.toLowerCase()}`)
-      .join(", ");
-
-    const newSale = {
-      id: `V-00${126 + salesList.length}`,
-      date: dateStr,
-      time: timeStr,
-      itemsSummary: summary,
-      itemCount: totalItems,
-      total: totalAmount,
-      status: "Completada",
-    };
-
-    setSalesList([newSale, ...salesList]);
-    setCart([]); // Vacía el carrito de la pantalla inicio al finalizar el pago
+  const handleLogout = () => {
+    setToken(null);
+    setCart([]);
+    setScreen("login");
   };
 
   if (screen === "splash")
@@ -162,7 +106,7 @@ export const App: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setScreen("login")}
+          onClick={handleLogout}
           className="text-xs text-sky-600 hover:text-sky-800 font-semibold underline cursor-pointer"
         >
           Cerrar sesión
@@ -182,14 +126,28 @@ export const App: React.FC = () => {
             <InicioPOS
               cart={cart}
               setCart={setCart}
-              onOpenCobro={() => setIsCobroOpen(true)}
+              onOpenCobro={() => {
+                setSaleError("");
+                setIsCobroOpen(true);
+              }}
+              refreshKey={refreshKey}
             />
           )}
           {currentView === "inventario" && (
-            <Inventario onOpenAgregarProducto={() => {}} />
+            <Inventario
+              onOpenAgregarProducto={() => {
+                setInventoryProduct(null);
+                setIsInventoryModalOpen(true);
+              }}
+              onEditProducto={(product) => {
+                setInventoryProduct(product);
+                setIsInventoryModalOpen(true);
+              }}
+              refreshKey={refreshKey}
+            />
           )}
-          {currentView === "ventas" && <Ventas />}
-          {currentView === "pedidos" && <Pedidos />}
+          {currentView === "ventas" && <Ventas refreshKey={refreshKey} />}
+          {currentView === "pedidos" && <Pedidos refreshKey={refreshKey} />}
         </main>
       </div>
 
@@ -199,7 +157,26 @@ export const App: React.FC = () => {
         totalAmount={totalAmount}
         totalItems={totalItems}
         onConfirmSale={handleConfirmSale}
+        error={saleError}
+        isSubmitting={isSaleSubmitting}
       />
+
+      {isInventoryModalOpen && (
+        <EstadoInventarioModal
+          key={inventoryProduct?.id ?? "new-product"}
+          isOpen
+          product={inventoryProduct}
+          onClose={() => {
+            setIsInventoryModalOpen(false);
+            setInventoryProduct(null);
+          }}
+          onCreated={() => {
+            setIsInventoryModalOpen(false);
+            setInventoryProduct(null);
+            setRefreshKey((key) => key + 1);
+          }}
+        />
+      )}
     </div>
   );
 };

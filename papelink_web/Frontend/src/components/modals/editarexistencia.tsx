@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   product: any | null;
-  onSave: (stock: number) => void;
+  onSave: (stock: number) => Promise<boolean>;
 }
 
 export const EditarExistenciaModal: React.FC<Props> = ({ isOpen, onClose, product, onSave }) => {
-  const [stock, setStock] = useState<number>(0);
-
-  useEffect(() => {
-    if (product) setStock(product.stock);
-  }, [product]);
+  const [stock, setStock] = useState<number>(product?.stock ?? 0);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen || !product) return null;
 
@@ -24,6 +22,8 @@ export const EditarExistenciaModal: React.FC<Props> = ({ isOpen, onClose, produc
           <label className="block text-xs font-semibold text-slate-700 mb-1">Cantidad en stock</label>
           <input
             type="number"
+            min="0"
+            step="1"
             value={stock}
             onChange={(e) => setStock(Number(e.target.value))}
             className="w-full bg-sky-50/40 border border-sky-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
@@ -31,8 +31,25 @@ export const EditarExistenciaModal: React.FC<Props> = ({ isOpen, onClose, produc
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button onClick={onClose} className="px-4 py-2 border border-sky-200 text-xs rounded-xl">Cancelar</button>
-          <button onClick={() => { onSave(stock); onClose(); }} className="px-4 py-2 bg-sky-600 text-white text-xs font-bold rounded-xl">Guardar</button>
+          <button
+            disabled={isSaving}
+            onClick={async () => {
+              setIsSaving(true);
+              setError("");
+              try {
+                if (await onSave(stock)) onClose();
+              } catch (requestError) {
+                setError(requestError instanceof Error ? requestError.message : "No se pudo actualizar el stock.");
+              } finally {
+                setIsSaving(false);
+              }
+            }}
+            className="px-4 py-2 bg-sky-600 text-white text-xs font-bold rounded-xl"
+          >
+            {isSaving ? "Guardando..." : "Guardar"}
+          </button>
         </div>
+        {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
       </div>
     </div>
   );
