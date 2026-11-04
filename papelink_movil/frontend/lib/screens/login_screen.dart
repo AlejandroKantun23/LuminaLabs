@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/widgets/aviso_proximamente.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +15,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _ocultarPassword = true;
 
   static const Color azul = Color(0xFF0A7FC4);
-  static const Color azulClaro = Color(0xFFE6F2FB);
 
   @override
   void dispose() {
@@ -62,11 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Color(0x14000000),
                       blurRadius: 20,
-                      offset: const Offset(0, 8),
+                      offset: Offset(0, 8),
                     ),
                   ],
                 ),
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Encabezado: logo + versión
+                    // Encabezado: logo + nombre
                     Row(
                       children: [
                         Container(
@@ -87,79 +87,28 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Icon(Icons.edit, color: Colors.white),
                         ),
                         const SizedBox(width: 10),
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Papelink',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: azulClaro,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'POS',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: azul,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              'Papelink',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            const Text(
+                            Text(
                               'Control de Papelería',
                               style: TextStyle(fontSize: 11, color: azul),
                             ),
                           ],
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE3F7EE),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            '● v2.4',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF0E9F6E),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 24),
 
                     // Título
-                    const Row(
-                      children: [
-                        Icon(Icons.lock_outline, size: 14, color: azul),
-                        SizedBox(width: 4),
-                        Text(
-                          'ACCESO ADMINISTRATIVO',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: azul,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+
                     const SizedBox(height: 8),
                     const Text(
                       'Inicia sesión',
@@ -170,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                      'Accede para administrar inventario, emitir ventas de mostrador y gestionar tus pedidos.',
+                      'Accede para Poder realizar pedidos',
                       style: TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const SizedBox(height: 20),
@@ -226,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () => AvisoProximamente.mostrar(context),
                         child: const Text(
                           '¿Olvidaste tu contraseña?',
                           style: TextStyle(color: azul, fontSize: 12),
@@ -258,40 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-
-                    // Sucursal
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F8FB),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.store_outlined,
-                              size: 16, color: azul),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Sucursal Centro',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {},
-                            child: const Text(
-                              'Cambiar',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: azul,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14),
                     const Divider(),
 
                     // Contacto
@@ -303,21 +218,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Center(
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () => AvisoProximamente.mostrar(context),
                         child: const Text(
-                          'Contacta a tu administrador',
+                          'Contacta con los administradores',
                           style: TextStyle(
                             color: azul,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),
-                    const Center(
-                      child: Text(
-                        '🛡 Conexión cifrada SSL, punto de venta',
-                        style: TextStyle(color: Colors.grey, fontSize: 10),
                       ),
                     ),
                   ],
