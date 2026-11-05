@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/screens/register_screen.dart';
+import 'package:frontend/services/usuario_service.dart';
 import 'package:frontend/widgets/aviso_proximamente.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,6 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
     if (correo.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Llena todos los campos')),
+      );
+      return;
+    }
+
+    final usuario = UsuarioService.iniciarSesion(correo, password);
+
+    if (usuario == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Correo o contraseña incorrectos')),
       );
       return;
     }
@@ -98,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             Text(
-                              'Control de Papelería',
+                              'Tu papelería a un toque',
                               style: TextStyle(fontSize: 11, color: azul),
                             ),
                           ],
@@ -108,7 +119,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     // Título
-
+                    const Row(
+                      children: [
+                        Icon(Icons.shopping_bag_outlined,
+                            size: 14, color: azul),
+                        SizedBox(width: 4),
+                        Text(
+                          'BIENVENIDO',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: azul,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     const Text(
                       'Inicia sesión',
@@ -119,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                      'Accede para Poder realizar pedidos',
+                      'Ingresa para reservar tus productos y consultar el estado de tus reservas.',
                       style: TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const SizedBox(height: 20),
@@ -135,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.email_outlined),
-                        hintText: 'caja1@papelink.com',
+                        hintText: 'nombre@correo.com',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -184,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 4),
 
-                    // Botón
+                    // Botón iniciar sesión
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -206,13 +231,42 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 8),
+
+                    // Crear cuenta
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '¿No tienes cuenta?',
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RegisterScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Crear cuenta',
+                            style: TextStyle(
+                              color: azul,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const Divider(),
 
                     // Contacto
                     const Center(
                       child: Text(
-                        '¿Necesitas acceso a Papelink?',
+                        '¿Tienes dudas?',
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ),
@@ -220,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextButton(
                         onPressed: () => AvisoProximamente.mostrar(context),
                         child: const Text(
-                          'Contacta con los administradores',
+                          'Contáctanos',
                           style: TextStyle(
                             color: azul,
                             fontSize: 12,
