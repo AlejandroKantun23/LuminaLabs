@@ -162,11 +162,6 @@ export const Ventas: React.FC<Props> = ({ refreshKey }) => {
             <h3 className="font-bold text-sm text-slate-900">Registro de ventas</h3>
             <p className="text-[10px] text-sky-700 font-medium mt-0.5">{periodLabel} · Más recientes primero</p>
           </div>
-          <div className="bg-sky-50/80 p-1 rounded-xl flex text-xs border border-sky-200/60">
-            <button onClick={() => selectPeriod('hoy')} className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'hoy' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}>Hoy</button>
-            <button onClick={() => selectPeriod('semana')} className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'semana' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}>Esta semana</button>
-            <button onClick={() => selectPeriod('mes')} className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer ${activeTab === 'mes' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700'}`}>Este mes</button>
-          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
