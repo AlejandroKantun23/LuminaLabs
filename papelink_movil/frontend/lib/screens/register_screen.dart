@@ -25,30 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  // Cuenta cuántos requisitos cumple la contraseña (0 a 4)
-  int _nivel() {
-    final p = _passwordController.text;
-    int n = 0;
-    if (p.length > 4) n++; // más de 4 caracteres
-    if (RegExp(r'[A-Z]').hasMatch(p)) n++; // una mayúscula
-    if (RegExp(r'[0-9]').hasMatch(p)) n++; // un número
-    if (RegExp(r'[^A-Za-z0-9\s]').hasMatch(p)) n++; // un símbolo ($ # " . !)
-    return n;
-  }
-
-  Color _colorNivel(int n) {
-    switch (n) {
-      case 1:
-        return Colors.red;
-      case 2:
-        return Colors.orange;
-      case 3:
-        return Colors.amber;
-      default:
-        return Colors.green;
-    }
-  }
-
   void _crearCuenta() {
     final nombre = _nombreController.text.trim();
     final correo = _correoController.text.trim();
@@ -57,14 +33,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (nombre.isEmpty || correo.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Llena todos los campos')),
-      );
-      return;
-    }
-
-    if (_nivel() < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('La contraseña no cumple los requisitos')),
       );
       return;
     }
@@ -88,9 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final nivel = _nivel();
-    final etiquetas = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear cuenta'),
@@ -182,7 +147,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: _ocultarPassword,
-                      onChanged: (_) => setState(() {}), // actualiza la barra
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock_outline),
                         hintText: 'Crea tu contraseña',
@@ -202,39 +166,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Barra de seguridad (4 niveles)
-                    Row(
-                      children: List.generate(4, (i) {
-                        return Expanded(
-                          child: Container(
-                            height: 5,
-                            margin: EdgeInsets.only(right: i < 3 ? 4 : 0),
-                            decoration: BoxDecoration(
-                              color: i < nivel
-                                  ? _colorNivel(nivel)
-                                  : Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      etiquetas[nivel],
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: nivel == 0 ? Colors.grey : _colorNivel(nivel),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Debe tener mayúscula, número, símbolo (\$ # " . !) y más de 4 caracteres.',
-                      style: TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                     const SizedBox(height: 20),
 
