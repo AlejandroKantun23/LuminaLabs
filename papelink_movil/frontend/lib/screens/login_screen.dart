@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
-import 'package:frontend/widgets/aviso_proximamente.dart';
+import 'package:frontend/screens/recoverypassword_screen.dart';
+import 'package:frontend/screens/contactos_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -200,7 +201,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => AvisoProximamente.mostrar(context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RecoveryPasswordScreen(),
+                           ),
+                          );
+                        },
                         child: const Text(
                           '¿Olvidaste tu contraseña?',
                           style: TextStyle(color: azul, fontSize: 12),
@@ -272,7 +280,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Center(
                       child: TextButton(
-                        onPressed: () => AvisoProximamente.mostrar(context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ContactosScreen(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           'Contáctanos',
                           style: TextStyle(
