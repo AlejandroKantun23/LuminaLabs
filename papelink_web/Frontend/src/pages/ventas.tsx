@@ -1,17 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { getVentas } from '../api/client';
-import type { VentaApi } from '../api/client';
+import React, { useEffect, useMemo, useState } from "react";
+import { getVentas } from "../api/client";
+import type { VentaApi } from "../api/client";
 
 interface Props {
   refreshKey?: number;
   onSelectVenta?: (venta: VentaApi) => void;
 }
 
-// Obtiene la fecha YYYY-MM-DD en la zona horaria local
 const getLocalISODate = (date = new Date()): string => {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -19,19 +18,19 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
   const todayISO = useMemo(() => getLocalISODate(), []);
   const todayDisplay = useMemo(
     () =>
-      new Date().toLocaleDateString('es-MX', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
+      new Date().toLocaleDateString("es-MX", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       }),
-    []
+    [],
   );
 
   const [ventas, setVentas] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
 
-  const [searchId, setSearchId] = useState<string>('');
+  const [searchId, setSearchId] = useState<string>("");
   const [dateFrom, setDateFrom] = useState<string>(todayISO);
   const [dateTo, setDateTo] = useState<string>(todayISO);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -44,12 +43,16 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
       .then((data) => {
         if (active) {
           setVentas(Array.isArray(data) ? data : []);
-          setError('');
+          setError("");
         }
       })
       .catch((err: unknown) => {
         if (active) {
-          setError(err instanceof Error ? err.message : 'No se pudieron cargar las ventas.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : "No se pudieron cargar las ventas.",
+          );
         }
       })
       .finally(() => {
@@ -71,42 +74,45 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
     return getLocalISODate(parsed);
   };
 
-  // Convierte el ID de la venta al formato V-00125
   const formatIdentificador = (v: any): string => {
-    return `V-${String(v.id).padStart(5, '0')}`;
+    return `V-${String(v.id).padStart(5, "0")}`;
   };
 
   const formatFechaHora = (v: any): { fecha: string; hora: string } => {
     const raw = getRawDate(v);
-    if (!raw) return { fecha: todayDisplay, hora: '--:-- h' };
+    if (!raw) return { fecha: todayDisplay, hora: "--:-- h" };
     const parsed = new Date(raw);
-    if (isNaN(parsed.getTime())) return { fecha: raw, hora: '' };
+    if (isNaN(parsed.getTime())) return { fecha: raw, hora: "" };
 
-    const fecha = parsed.toLocaleDateString('es-MX', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+    const fecha = parsed.toLocaleDateString("es-MX", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
     const hora =
-      parsed.toLocaleTimeString('es-MX', {
-        hour: '2-digit',
-        minute: '2-digit',
+      parsed.toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
-      }) + ' h';
+      }) + " h";
 
     return { fecha, hora };
   };
 
-  // =========================================================================
-  // CÁLCULO DE LOS 3 CUADROS SUPERIORES (SOLO VENTAS DEL DÍA DE HOY)
-  // =========================================================================
   const resumenHoy = useMemo(() => {
     const ventasHoy = ventas.filter((v) => getVentaDateISO(v) === todayISO);
 
-    const sumaTotalHoy = ventasHoy.reduce((acc, v) => acc + Number(v.total || 0), 0);
+    const sumaTotalHoy = ventasHoy.reduce(
+      (acc, v) => acc + Number(v.total || 0),
+      0,
+    );
     const cantidadVentasHoy = ventasHoy.length;
-    const articulosVendidosHoy = ventasHoy.reduce((acc, v) => acc + Number(v.articulos || 0), 0);
-    const ticketPromedioHoy = cantidadVentasHoy > 0 ? sumaTotalHoy / cantidadVentasHoy : 0;
+    const articulosVendidosHoy = ventasHoy.reduce(
+      (acc, v) => acc + Number(v.articulos || 0),
+      0,
+    );
+    const ticketPromedioHoy =
+      cantidadVentasHoy > 0 ? sumaTotalHoy / cantidadVentasHoy : 0;
 
     return {
       sumaTotalHoy,
@@ -116,17 +122,15 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
     };
   }, [ventas, todayISO]);
 
-  // =========================================================================
-  // FILTRADO DE LA TABLA
-  // =========================================================================
   const ventasFiltradas = useMemo(() => {
     return [...ventas]
       .sort((a, b) => Number(b.id) - Number(a.id))
       .filter((v) => {
         const query = searchId.trim().toLowerCase();
         const idV = formatIdentificador(v).toLowerCase();
-        const ticketT = (v.ticket ?? '').toLowerCase();
-        const matchesId = !query || idV.includes(query) || ticketT.includes(query);
+        const ticketT = (v.ticket ?? "").toLowerCase();
+        const matchesId =
+          !query || idV.includes(query) || ticketT.includes(query);
 
         const fechaISO = getVentaDateISO(v);
         const matchesFrom = !dateFrom || fechaISO >= dateFrom;
@@ -136,16 +140,22 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
       });
   }, [ventas, searchId, dateFrom, dateTo]);
 
-  const totalPeriodoMonto = ventasFiltradas.reduce((acc, v) => acc + Number(v.total || 0), 0);
+  const totalPeriodoMonto = ventasFiltradas.reduce(
+    (acc, v) => acc + Number(v.total || 0),
+    0,
+  );
   const totalPeriodoArticulos = ventasFiltradas.reduce(
     (acc, v) => acc + Number(v.articulos || 0),
-    0
+    0,
   );
 
-  const totalPages = Math.max(1, Math.ceil(ventasFiltradas.length / itemsPerPage));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(ventasFiltradas.length / itemsPerPage),
+  );
   const ventasPaginadas = ventasFiltradas.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -157,11 +167,11 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
         </p>
       </div>
 
-      {/* 3 Cuadros Superiores */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Izquierda: Suma total de todas las ventas del día */}
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas de hoy</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ventas de hoy
+          </span>
           <span className="text-2xl font-extrabold text-slate-900">
             ${resumenHoy.sumaTotalHoy.toFixed(2)}
           </span>
@@ -170,9 +180,10 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </span>
         </div>
 
-        {/* En medio: Cantidad de ventas hechas en el día */}
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas registradas</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ventas registradas
+          </span>
           <span className="text-2xl font-extrabold text-slate-900">
             {resumenHoy.cantidadVentasHoy}
           </span>
@@ -181,9 +192,10 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </span>
         </div>
 
-        {/* Derecha: Ticket promedio del día */}
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">Ticket promedio</span>
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ticket promedio
+          </span>
           <span className="text-2xl font-extrabold text-slate-900">
             ${resumenHoy.ticketPromedioHoy.toFixed(2)}
           </span>
@@ -199,16 +211,16 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
         </p>
       )}
 
-      {/* Tabla de Registro de Ventas */}
       <div className="bg-white border border-sky-100 rounded-2xl shadow-xs p-4 sm:p-6 space-y-5">
         <div>
-          <h2 className="font-bold text-sm text-slate-900">Registro de ventas</h2>
+          <h2 className="font-bold text-sm text-slate-900">
+            Registro de ventas
+          </h2>
           <p className="text-[11px] text-sky-700 font-medium mt-0.5">
             {todayDisplay} · Más recientes primero
           </p>
         </div>
 
-        {/* Filtros */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-[11px] font-semibold text-slate-700 mb-1">
@@ -216,7 +228,12 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
             </label>
             <div className="relative flex items-center">
               <span className="absolute left-3 text-sky-500">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -239,7 +256,9 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">Desde</label>
+            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+              Desde
+            </label>
             <input
               type="date"
               value={dateFrom}
@@ -252,7 +271,9 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">Hasta</label>
+            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+              Hasta
+            </label>
             <input
               type="date"
               value={dateTo}
@@ -265,7 +286,6 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </div>
         </div>
 
-        {/* Tabla */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[650px]">
             <thead>
@@ -299,18 +319,28 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
                     venta.articulos_resumen || `${cantidadArticulos} artículos`;
 
                   return (
-                    <tr key={venta.id} className="hover:bg-sky-50/40 transition">
+                    <tr
+                      key={venta.id}
+                      className="hover:bg-sky-50/40 transition"
+                    >
                       <td className="py-4 font-bold text-slate-900">
                         {formatIdentificador(venta)}
                       </td>
                       <td className="py-4">
-                        <div className="text-slate-800 font-medium">{fecha}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">{hora}</div>
+                        <div className="text-slate-800 font-medium">
+                          {fecha}
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-0.5">
+                          {hora}
+                        </div>
                       </td>
                       <td className="py-4">
-                        <div className="text-slate-800 font-medium">{resumenArticulos}</div>
+                        <div className="text-slate-800 font-medium">
+                          {resumenArticulos}
+                        </div>
                         <div className="text-[11px] text-slate-500 mt-0.5">
-                          {cantidadArticulos} {cantidadArticulos === 1 ? 'artículo' : 'artículos'}
+                          {cantidadArticulos}{" "}
+                          {cantidadArticulos === 1 ? "artículo" : "artículos"}
                         </div>
                       </td>
                       <td className="py-4 text-right font-bold text-slate-900">
@@ -338,20 +368,20 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </table>
         </div>
 
-        {/* Resumen del período */}
         <div className="bg-sky-50/70 border border-sky-200/80 rounded-xl px-4 py-3 flex justify-between items-center text-xs font-bold text-sky-950">
           <span>
-            Total del período · {ventasFiltradas.length}{' '}
-            {ventasFiltradas.length === 1 ? 'venta' : 'ventas'} · {totalPeriodoArticulos}{' '}
-            {totalPeriodoArticulos === 1 ? 'artículo' : 'artículos'}
+            Total del período · {ventasFiltradas.length}{" "}
+            {ventasFiltradas.length === 1 ? "venta" : "ventas"} ·{" "}
+            {totalPeriodoArticulos}{" "}
+            {totalPeriodoArticulos === 1 ? "artículo" : "artículos"}
           </span>
           <span>${totalPeriodoMonto.toFixed(2)} MXN</span>
         </div>
 
-        {/* Paginación */}
         <div className="flex justify-between items-center text-[11px] text-slate-500 pt-1">
           <span>
-            Mostrando {ventasPaginadas.length} de {ventasFiltradas.length} ventas
+            Mostrando {ventasPaginadas.length} de {ventasFiltradas.length}{" "}
+            ventas
           </span>
           <div className="flex items-center gap-2">
             <span>
