@@ -4,12 +4,13 @@
 // ============================================================================
 export class Venta {
     id: number;
-    ticket: string;                  // T-000123
+    ticket: string;                   // T-000123
     fecha_venta: Date;
     total: number;
     metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia';
-    atendio: string;                 // Empleado que cobró
+    atendio: string;                   // Empleado que cobró
     articulos: number;
+    articulos_resumen: string;         // NUEVO: "3 cuadernos, 2 tijeras"
     pedido_id: number | null;
     detalle?: DetalleVenta[];
 
@@ -21,6 +22,7 @@ export class Venta {
         this.metodo_pago = fila.metodo_pago;
         this.atendio = fila.atendio;
         this.articulos = Number(fila.articulos ?? 0);
+        this.articulos_resumen = fila.articulos_resumen ?? 'Sin artículos';
         this.pedido_id = fila.pedido_id ?? null;
     }
 }

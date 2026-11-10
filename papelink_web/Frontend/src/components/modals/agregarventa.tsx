@@ -19,11 +19,15 @@ export const EstadoNegocioModal: React.FC<Props> = ({
   error = "",
   isSubmitting = false,
 }) => {
-  const [payment, setPayment] = useState<number>(0);
+  // CAMBIO 1: Iniciar como cadena vacía para que no aparezca el 0
+  const [payment, setPayment] = useState<string>("");
 
   if (!isOpen) return null;
 
-  const change = Math.max(0, payment - totalAmount);
+  // CAMBIO 2: Convertir a número únicamente para las validaciones y el cambio
+  const numericPayment = parseFloat(payment) || 0;
+  const isPaymentInsufficient = numericPayment < totalAmount;
+  const change = Math.max(0, numericPayment - totalAmount);
 
   return (
     <div className="fixed inset-0 bg-blue-950/30 backdrop-blur-xs flex items-center justify-center z-50 p-4 select-none">
@@ -61,14 +65,29 @@ export const EstadoNegocioModal: React.FC<Props> = ({
             <label htmlFor="pago-con" className="text-gray-600">
               Pago Con $
             </label>
+            {/* CAMBIO 3: Guardar el valor como string y dejar el campo limpio */}
             <input
               id="pago-con"
               type="number"
+              min={0}
+              step="0.01"
+              placeholder="0.00"
               value={payment}
-              onChange={(e) => setPayment(Number(e.target.value))}
-              className="w-28 text-right border border-blue-200 rounded-lg px-2 py-1.5 font-bold text-gray-800 focus:outline-none focus:border-blue-500"
+              onChange={(e) => setPayment(e.target.value)}
+              className={`w-28 text-right border rounded-lg px-2 py-1.5 font-bold text-gray-800 placeholder-gray-300 focus:outline-none ${
+                payment !== "" && isPaymentInsufficient
+                  ? "border-red-400 focus:border-red-500"
+                  : "border-blue-200 focus:border-blue-500"
+              }`}
             />
           </div>
+
+          {payment !== "" && isPaymentInsufficient && (
+            <p className="text-[11px] text-red-600 font-medium text-right">
+              Faltan ${(totalAmount - numericPayment).toFixed(2)} para cubrir el total.
+            </p>
+          )}
+
           <div className="flex justify-between items-center text-xs border-t border-blue-50 pt-3 font-semibold">
             <span className="text-gray-600">Su Cambio $</span>
             <span className="font-bold text-blue-600 text-sm">
@@ -79,20 +98,26 @@ export const EstadoNegocioModal: React.FC<Props> = ({
 
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <button
-            onClick={onClose}
+            onClick={() => {
+              // CAMBIO 4: Limpiar con cadena vacía al cerrar
+              setPayment("");
+              onClose();
+            }}
             className="px-4 py-2.5 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 cursor-pointer"
           >
             Cancelar
           </button>
           <button
-            disabled={isSubmitting}
+            disabled={isSubmitting || isPaymentInsufficient}
             onClick={async () => {
+              if (isPaymentInsufficient) return;
               if (await onConfirmSale()) {
-                setPayment(0);
+                // CAMBIO 4: Limpiar con cadena vacía tras confirmar
+                setPayment("");
                 onClose();
               }
             }}
-            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm cursor-pointer"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer"
           >
             {isSubmitting ? "Procesando..." : "Cobrar e Imprimir Ticket"}
           </button>

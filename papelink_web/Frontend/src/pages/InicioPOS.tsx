@@ -27,6 +27,8 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro, refresh
   const [searchTerm, setSearchTerm] = useState('');
   const [quantity, setQuantity] = useState<number>(1);
   const [filteredCatalog, setFilteredCatalog] = useState<Product[]>([]);
+  // CAMBIO 1: Estado para controlar la visibilidad de la ventana de opciones
+  const [showOptions, setShowOptions] = useState<boolean>(false);
   const [summary, setSummary] = useState<ResumenDia | null>(null);
   const [recentSales, setRecentSales] = useState<VentaApi[]>([]);
   const [inventoryResult, setInventoryResult] = useState<{
@@ -110,6 +112,9 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro, refresh
       setCart([...cart, { ...product, qty: Number(quantity) || 1 }]);
     }
     setSearchTerm('');
+    // CAMBIO 3: Limpiar y ocultar la ventana de opciones al agregar un producto
+    setFilteredCatalog([]);
+    setShowOptions(false);
     setQuantity(1);
   };
 
@@ -152,6 +157,7 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro, refresh
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
           <span className="text-[11px] text-sky-800 font-bold block mb-1">Ventas de hoy</span>
           <span className="text-2xl font-extrabold text-slate-900">${(summary?.ventas_hoy ?? 0).toFixed(2)}</span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">MXN</span>
         </div>
         <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
           <span className="text-[11px] text-sky-800 font-bold block mb-1">Unidades disponibles</span>
@@ -187,23 +193,43 @@ export const InicioPOS: React.FC<Props> = ({ cart, setCart, onOpenCobro, refresh
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </span>
+                {/* CAMBIO 2: Eventos onChange, onFocus y onKeyDown para ocultar al dar Enter */}
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    if (!e.target.value.trim()) setFilteredCatalog([]);
+                    const value = e.target.value;
+                    setSearchTerm(value);
+                    if (!value.trim()) {
+                      setFilteredCatalog([]);
+                      setShowOptions(false);
+                    } else {
+                      setShowOptions(true);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (searchTerm.trim()) {
+                      setShowOptions(true);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      setShowOptions(false);
+                      e.currentTarget.blur();
+                    }
                   }}
                   placeholder="Nombre o modelo (ej. Cuaderno)"
                   className="w-full bg-sky-50/40 border border-sky-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
-              {filteredCatalog.length > 0 && (
+              {/* CAMBIO 4: Se condiciona también con showOptions */}
+              {showOptions && filteredCatalog.length > 0 && (
                 <div className="absolute left-0 right-0 top-16 bg-white border border-sky-200 rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-sky-50">
                   {filteredCatalog.map((prod) => (
                     <div
-                        key={prod.productId}
+                      key={prod.productId}
                       onClick={() => handleAddProduct(prod)}
                       className="p-3 hover:bg-sky-50 cursor-pointer flex justify-between items-center transition"
                     >
