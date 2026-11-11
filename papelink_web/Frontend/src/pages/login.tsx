@@ -37,7 +37,6 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen bg-[#F0F4F8] flex flex-col justify-between font-sans text-gray-800 select-none">
-      {/* Barra Superior Header */}
       <header className="h-16 bg-white border-b border-blue-100 px-4 sm:px-8 flex items-center justify-between shadow-xs">
         <h1 className="text-xl font-bold tracking-tight text-blue-600">
           Papelink
@@ -47,10 +46,8 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
         </span>
       </header>
 
-      {/* Tarjeta Central de Login */}
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-md border border-blue-100 p-6 sm:p-8">
-          {/* Encabezado de la Tarjeta */}
           <div className="mb-6">
             <span className="text-[10px] font-bold tracking-widest text-blue-500 uppercase block mb-1">
               ACCESO ADMINISTRATIVO
@@ -64,14 +61,13 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
             </p>
           </div>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <p role="alert" className="text-xs font-medium text-red-600">
                 {error}
               </p>
             )}
-            {/* Campo Correo Electrónico */}
+
             <div>
               <label
                 htmlFor="login-email"
@@ -107,7 +103,6 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
               </div>
             </div>
 
-            {/* Campo Contraseña */}
             <div>
               <label
                 htmlFor="login-password"
@@ -143,7 +138,9 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={
+                    showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                  }
                   className="absolute right-3.5 text-gray-400 hover:text-blue-600 focus:outline-none"
                 >
                   <svg
@@ -169,7 +166,6 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
               </div>
             </div>
 
-            {/* Olvidaste tu contraseña */}
             <div className="pt-1">
               <a
                 href="#forgot"
@@ -179,14 +175,15 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
               </a>
             </div>
 
-            {/* Botón de Iniciar Sesión */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
-                <span>{isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}</span>
+                <span>
+                  {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+                </span>
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -204,7 +201,6 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
             </div>
           </form>
 
-          {/* Separador y Soporte */}
           <div className="mt-8 border-t border-gray-100 pt-6 text-center space-y-1">
             <p className="text-[11px] text-gray-500">
               ¿Necesitas acceso a Papelink?
@@ -219,7 +215,6 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
         </div>
       </main>
 
-      {/* Pie de página Footer */}
       <footer className="px-4 sm:px-8 py-4 text-[11px] text-gray-400 space-y-0.5 bg-white border-t border-blue-50">
         <div>© 2026 Papelink</div>
         <div>Administración de tu papelería</div>
