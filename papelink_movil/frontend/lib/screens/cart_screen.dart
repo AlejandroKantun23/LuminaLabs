@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/home_header.dart';
 
 // Modelo para los productos
 class CartItem {
@@ -65,7 +66,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
-      appBar: _buildAppBar(),
+      appBar: HomeHeader(),
       body: Stack(
         children: [
           // Contenido desplazable (Header del carrito + Lista)
@@ -87,95 +88,6 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  // --- APP BAR CUSTOM ---
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: Container(
-        margin: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
-          color: Color(0xFFEDF4F9),
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          icon: const Icon(Icons.menu, color: Color(0xFF005691), size: 20),
-          onPressed: () {},
-        ),
-      ),
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0088CC),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.attach_file, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Papelink.',
-                style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              Text(
-                'PUNTO DE VENTA',
-                style: TextStyle(
-                  color: Color(0xFF0088CC),
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 16),
-          child: Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Container(
-                margin: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEDF4F9),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.receipt_long_outlined,
-                      color: Color(0xFF005691), size: 20),
-                  onPressed: () {},
-                ),
-              ),
-              Positioned(
-                right: 6,
-                top: 6,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF10B981),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -545,104 +457,8 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          // Botón Secundario: Cobrar en mostrador
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.print_outlined, size: 18),
-              label: const Text(
-                'Cobrar directamente en mostrador',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF0088CC),
-                ),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFF0F9FF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
-
-  // --- NAVEGACIÓN INFERIOR ---
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Color(0xFFF1F5F9), width: 1),
-        ),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: 1, // "Carrito" activo
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0088CC),
-        unselectedItemColor: const Color(0xFF94A3B8),
-        selectedFontSize: 11,
-        unselectedFontSize: 11,
-        elevation: 0,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_rounded),
-            label: 'Catálogo',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Icon(Icons.shopping_basket_outlined),
-                Positioned(
-                  right: -6,
-                  top: -4,
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0088CC),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      '${_items.length}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            label: 'Carrito',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            label: 'Apartados',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.tune_outlined),
-            label: 'Ajustes',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CartScreen(),
-    ),
-  );
 }

@@ -53,7 +53,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(//boton provisional pa no hacer la cuenta 
+                                      floatingActionButton: FloatingActionButton.extended(
+                                        onPressed: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const HomeScreen(),
+                                            ),
+                                          );
+                                        },
+                                        backgroundColor: azul,
+                                        foregroundColor: Colors.white,
+                                        elevation: 6,
+                                        icon: const Icon(Icons.explore_outlined),
+                                        label: const Text('Modo Invitado', style: TextStyle( fontWeight: FontWeight.bold),),
+                                      ),
+      //codigo normal
       body: Container(
         width: double.infinity,
         height: double.infinity,

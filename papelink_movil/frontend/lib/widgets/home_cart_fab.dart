@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/cart_screen.dart';
 
 class HomeCartFab extends StatelessWidget {
   const HomeCartFab({super.key});
@@ -24,7 +25,7 @@ class HomeCartFab extends StatelessWidget {
           ),
           child: IconButton(
             icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 28),
-            onPressed: () {},
+            onPressed: () {Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => CartScreen())));},
           ),
         ),
         Positioned(
