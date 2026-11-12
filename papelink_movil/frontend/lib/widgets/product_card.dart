@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/producto.dart';
 
 class ProductCard extends StatelessWidget {
-  final String title;
-  final String dispo;
-  final bool inStock;
-  final bool isLowStock;
-  final String price;
-  final String unit;
-  final IconData icon;
+  final Producto product;
+  final bool canAdd;
+  final VoidCallback onAdd;
 
   const ProductCard({
     super.key,
-    required this.title,
-    required this.dispo,
-    required this.inStock,
-    required this.isLowStock,
-    required this.price,
-    required this.unit,
-    required this.icon,
+    required this.product,
+    required this.canAdd,
+    required this.onAdd,
   });
 
   @override
@@ -29,7 +22,7 @@ class ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -44,12 +37,16 @@ class ProductCard extends StatelessWidget {
                 color: const Color(0xFFF0F6FF),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 48, color: const Color(0xFF0088CC)),
+              child: Icon(
+                product.icono,
+                size: 48,
+                color: const Color(0xFF0088CC),
+              ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            product.nombre,
             textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             maxLines: 2,
@@ -59,19 +56,23 @@ class ProductCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: !inStock
+              color: !product.disponible
                   ? const Color(0xFFFFEBEB)
-                  : (isLowStock ? const Color(0xFFFFF3E0) : const Color(0xFFE6F4EA)),
+                  : (product.stockBajo
+                        ? const Color(0xFFFFF3E0)
+                        : const Color(0xFFE6F4EA)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              dispo,
+              product.textoDisponibilidad,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: !inStock
+                color: !product.disponible
                     ? Colors.red
-                    : (isLowStock ? Colors.orange.shade800 : const Color(0xFF1E7E34)),
+                    : (product.stockBajo
+                          ? Colors.orange.shade800
+                          : const Color(0xFF1E7E34)),
               ),
             ),
           ),
@@ -82,29 +83,32 @@ class ProductCard extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                price,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                '\$${product.precio.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
-              if (unit.isNotEmpty)
+              if (product.unidad.isNotEmpty)
                 Text(
-                  ' $unit',
+                  ' ${product.unidad}',
                   style: const TextStyle(fontSize: 10, color: Colors.grey),
                 ),
             ],
           ),
           const SizedBox(height: 6),
           InkWell(
-            onTap: inStock ? () {} : null,
+            onTap: canAdd ? onAdd : null,
             child: Container(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: inStock ? const Color(0xFF0088CC) : Colors.grey.shade300,
+                color: canAdd ? const Color(0xFF0088CC) : Colors.grey.shade300,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.add,
-                color: inStock ? Colors.white : Colors.grey.shade600,
+                color: canAdd ? Colors.white : Colors.grey.shade600,
                 size: 20,
               ),
             ),

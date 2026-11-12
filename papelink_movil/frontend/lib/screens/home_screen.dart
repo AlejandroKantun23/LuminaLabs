@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/producto.dart';
+
 import '../widgets/home_header.dart';
 import '../widgets/search_bar_widget.dart';
 import '../widgets/category_chips.dart';
@@ -16,21 +18,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const HomeHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              PreferredSize(
+                preferredSize: Size.fromHeight(100),
+                child: HomeHeader(),
+              ),
               const SearchBarWidget(),
               const SizedBox(height: 16),
               const CategoryChips(),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     'Artículos Destacados',
                     style: TextStyle(
                       fontSize: 18,
@@ -39,8 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Text(
-                    '4 de 248 items',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    '${Producto.catalogo.length} artículos',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),

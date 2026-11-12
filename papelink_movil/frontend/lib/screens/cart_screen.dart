@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/producto.dart';
+import 'package:frontend/services/carrito_service.dart';
 import 'package:frontend/widgets/home_header.dart';
-
-// Modelo para los productos
-class CartItem {
-  final String name;
-  final int stock;
-  final double unitPrice;
-  int quantity;
-  final IconData icon;
-
-  CartItem({
-    required this.name,
-    required this.stock,
-    required this.unitPrice,
-    required this.quantity,
-    required this.icon,
-  });
-
-  double get totalPrice => unitPrice * quantity;
-}
+import 'package:frontend/screens/home_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -28,71 +12,64 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // Datos de ejemplo basados en la pantalla
-  final List<CartItem> _items = [
-    CartItem(
-      name: 'Lápiz de grafito',
-      stock: 15,
-      unitPrice: 10.00,
-      quantity: 5,
-      icon: Icons.edit_outlined,
-    ),
-    CartItem(
-      name: 'Borrador escolar',
-      stock: 19,
-      unitPrice: 7.00,
-      quantity: 2,
-      icon: Icons.cleaning_services_outlined,
-    ),
-    CartItem(
-      name: 'Libreta profesional',
-      stock: 6,
-      unitPrice: 25.00,
-      quantity: 1,
-      icon: Icons.menu_book_rounded,
-    ),
-  ];
-
-  int get _totalPieces =>
-      _items.fold(0, (sum, item) => sum + item.quantity);
-
-  double get _totalAmount =>
-      _items.fold(0.0, (sum, item) => sum + item.totalPrice);
-
-  double get _subtotal => _totalAmount / 1.16;
-  double get _iva => _totalAmount - _subtotal;
-
   @override
   Widget build(BuildContext context) {
+    final carrito = CarritoService.instance;
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
-      appBar: HomeHeader(),
-      body: Stack(
-        children: [
-          // Contenido desplazable (Header del carrito + Lista)
-          ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 260), // Espacio para el panel inferior
-            children: [
-              _buildCartHeader(),
-              const SizedBox(height: 16),
-              ..._items.map((item) => _buildCartCard(item)),
-            ],
-          ),
+      appBar: HomeHeader(
+        onBack: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        },
+      ),
+      body: AnimatedBuilder(
+        animation: carrito,
+        builder: (context, _) {
+          final items = carrito.items;
+          final total = carrito.total;
+          final subtotal = total / 1.16;
+          final iva = total - subtotal;
 
-          // Resumen flotante en la parte inferior
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _buildSummaryBottomSheet(),
-          ),
-        ],
+          return Stack(
+            children: [
+              ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 260),
+                children: [
+                  _buildCartHeader(carrito.totalArticulos),
+                  const SizedBox(height: 16),
+                  if (items.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48),
+                      child: Center(
+                        child: Text('Tu carrito está vacío. Agrega productos.'),
+                      ),
+                    )
+                  else
+                    ...items.map((item) => _buildCartCard(item, carrito)),
+                ],
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _buildSummaryBottomSheet(
+                  totalPieces: carrito.totalPiezas,
+                  subtotal: subtotal,
+                  iva: iva,
+                  total: total,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  // --- HEADER DE CARRITO ---
-  Widget _buildCartHeader() {
+  Widget _buildCartHeader(int itemCount) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,10 +88,7 @@ class _CartScreenState extends State<CartScreen> {
             SizedBox(height: 4),
             Text(
               'Venta en curso #POS-4892',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF64748B),
-              ),
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
             ),
           ],
         ),
@@ -125,7 +99,7 @@ class _CartScreenState extends State<CartScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            '${_items.length} artículos',
+            '$itemCount artículos',
             style: const TextStyle(
               color: Color(0xFF0369A1),
               fontSize: 12,
@@ -137,8 +111,8 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  // --- TARJETA DE PRODUCTO ---
-  Widget _buildCartCard(CartItem item) {
+  Widget _buildCartCard(ItemCarrito item, CarritoService carrito) {
+    final product = item.producto;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -147,7 +121,7 @@ class _CartScreenState extends State<CartScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -166,7 +140,11 @@ class _CartScreenState extends State<CartScreen> {
                   color: const Color(0xFFF0F9FF),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(item.icon, color: const Color(0xFF0284C7), size: 24),
+                child: Icon(
+                  product.icono,
+                  color: const Color(0xFF0284C7),
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               // Información del producto
@@ -175,7 +153,7 @@ class _CartScreenState extends State<CartScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.name,
+                      product.nombre,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -189,7 +167,7 @@ class _CartScreenState extends State<CartScreen> {
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: item.stock <= 6
+                            color: product.stockBajo
                                 ? Colors.amber[700]
                                 : const Color(0xFF10B981),
                             shape: BoxShape.circle,
@@ -197,10 +175,10 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${item.stock} dispo.',
+                          product.textoDisponibilidad,
                           style: TextStyle(
                             fontSize: 12,
-                            color: item.stock <= 6
+                            color: product.stockBajo
                                 ? Colors.amber[800]
                                 : const Color(0xFF059669),
                             fontWeight: FontWeight.w500,
@@ -211,7 +189,7 @@ class _CartScreenState extends State<CartScreen> {
                           style: TextStyle(color: Color(0xFF94A3B8)),
                         ),
                         Text(
-                          '\$${item.unitPrice.toStringAsFixed(2)} c/u',
+                          '\$${product.precio.toStringAsFixed(2)} ${product.unidad}',
                           style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF64748B),
@@ -224,13 +202,13 @@ class _CartScreenState extends State<CartScreen> {
               ),
               // Botón de eliminar
               IconButton(
-                icon: const Icon(Icons.delete_outline,
-                    color: Color(0xFFCBD5E1), size: 20),
-                onPressed: () {
-                  setState(() {
-                    _items.remove(item);
-                  });
-                },
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Color(0xFFCBD5E1),
+                  size: 20,
+                ),
+                onPressed: () =>
+                    _runCartAction(() => carrito.quitar(product.id)),
               ),
             ],
           ),
@@ -241,11 +219,14 @@ class _CartScreenState extends State<CartScreen> {
             children: [
               RichText(
                 text: TextSpan(
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF64748B),
+                  ),
                   children: [
                     const TextSpan(text: 'Total parcial: '),
                     TextSpan(
-                      text: '\$${item.totalPrice.toStringAsFixed(2)}',
+                      text: '\$${item.total.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF0F172A),
@@ -266,16 +247,13 @@ class _CartScreenState extends State<CartScreen> {
                       icon: Icons.remove,
                       color: Colors.white,
                       textColor: const Color(0xFF64748B),
-                      onTap: () {
-                        if (item.quantity > 1) {
-                          setState(() => item.quantity--);
-                        }
-                      },
+                      onTap: () =>
+                          _runCartAction(() => carrito.decrementar(product.id)),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        '${item.quantity}',
+                        '${item.cantidad}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -285,20 +263,37 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                     _buildCounterButton(
                       icon: Icons.add,
-                      color: const Color(0xFF0088CC),
-                      textColor: Colors.white,
-                      onTap: () {
-                        setState(() => item.quantity++);
-                      },
+                      color: carrito.puedeAgregar(product)
+                          ? const Color(0xFF0088CC)
+                          : Colors.grey.shade300,
+                      textColor: carrito.puedeAgregar(product)
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      onTap: carrito.puedeAgregar(product)
+                          ? () => _runCartAction(
+                              () => carrito.incrementar(product.id),
+                            )
+                          : () {},
                     ),
                   ],
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _runCartAction(Future<void> Function() action) async {
+    try {
+      await action();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo guardar el carrito: $error')),
+      );
+    }
   }
 
   Widget _buildCounterButton({
@@ -319,9 +314,9 @@ class _CartScreenState extends State<CartScreen> {
           boxShadow: color == Colors.white
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -331,7 +326,12 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   // --- PANEL INFERIOR / RESUMEN DE COMPRA ---
-  Widget _buildSummaryBottomSheet() {
+  Widget _buildSummaryBottomSheet({
+    required int totalPieces,
+    required double subtotal,
+    required double iva,
+    required double total,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
@@ -339,7 +339,7 @@ class _CartScreenState extends State<CartScreen> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -363,11 +363,11 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Subtotal ($_totalPieces piezas)',
+                'Subtotal ($totalPieces piezas)',
                 style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
               ),
               Text(
-                '\$${_subtotal.toStringAsFixed(2)} MXN',
+                '\$${subtotal.toStringAsFixed(2)} MXN',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF334155),
@@ -386,11 +386,8 @@ class _CartScreenState extends State<CartScreen> {
                 style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
               ),
               Text(
-                '\$${_iva.toStringAsFixed(2)} MXN',
-                style: const TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 12,
-                ),
+                '\$${iva.toStringAsFixed(2)} MXN',
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
               ),
             ],
           ),
@@ -414,7 +411,7 @@ class _CartScreenState extends State<CartScreen> {
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
-                    '\$${_totalAmount.toStringAsFixed(2)}',
+                    '\$${total.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
