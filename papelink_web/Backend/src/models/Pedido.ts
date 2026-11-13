@@ -1,7 +1,5 @@
-// ============================================================================
 // MODELO DE PEDIDO (APARTADO): Lo que el cliente aparta desde la app para
 // recogerlo y pagarlo en tienda. Se arma desde la vista v_pedidos.
-// ============================================================================
 export type EstadoPedido = 'pendiente' | 'confirmado_apartado' | 'listo_en_tienda' | 'completado' | 'cancelado';
 
 export class Pedido {

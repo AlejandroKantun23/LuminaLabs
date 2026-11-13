@@ -5,12 +5,10 @@ import { AuthRequest } from '../middleware/auth';
 import { cargarLineas } from '../utils/lineas';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE PEDIDOS (APARTADOS): El cliente aparta desde la app y el
 // personal los confirma, los deja listos y los cobra en el mostrador.
 // El stock se aparta al crear el pedido y se devuelve al cancelarlo: eso lo
 // hacen los triggers de la base de datos, aquí solo se manda el pedido.
-// ============================================================================
 
 // Cambios de estado que puede hacer el personal ('completado' solo con /cobrar)
 const SIGUIENTE: Record<string, string[]> = {

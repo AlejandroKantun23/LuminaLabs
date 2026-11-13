@@ -1,7 +1,5 @@
-// ============================================================================
 // MODELO DE USUARIO: Cliente (app móvil), empleado o admin (panel web).
 // Nunca incluye el password: así no puede salir por accidente en una respuesta.
-// ============================================================================
 export class Usuario {
     id: number;
     nombre: string;

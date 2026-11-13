@@ -2,9 +2,7 @@ import { Router } from 'express';
 import { usuarioController } from '../controllers/UsuarioController';
 import { autenticar, soloAdmin } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE USUARIOS (solo admin). Prefijo montado en index.ts: /api/usuarios
-// ============================================================================
 const router = Router();
 router.use(autenticar, soloAdmin);
 

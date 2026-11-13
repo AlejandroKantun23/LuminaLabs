@@ -5,10 +5,8 @@ import { Usuario } from '../models/Usuario';
 import { AuthRequest } from '../middleware/auth';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE USUARIOS (solo admin): lista las cuentas, da de alta
 // empleados / admins y activa o desactiva cuentas (sin borrar su historial).
-// ============================================================================
 class UsuarioController {
 
     public getAll = async (req: Request, res: Response): Promise<void> => {

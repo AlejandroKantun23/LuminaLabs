@@ -3,10 +3,8 @@ import { pool } from '../config/database';
 import { Categoria } from '../models/Categoria';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE CATEGORÍAS: Las puede ver cualquiera (catálogo de la app);
 // solo el admin las crea, edita o borra.
-// ============================================================================
 class CategoriaController {
 
     public getAll = async (req: Request, res: Response): Promise<void> => {

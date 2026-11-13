@@ -1,6 +1,4 @@
-// ============================================================================
 // MODELO DE CATEGORÍA: Organiza los artículos (Escritura, Cuadernos, Arte...).
-// ============================================================================
 export class Categoria {
     id: number;
     nombre: string;

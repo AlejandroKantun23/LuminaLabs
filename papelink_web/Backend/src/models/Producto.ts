@@ -1,6 +1,4 @@
-// ============================================================================
 // MODELO DE PRODUCTO: Un artículo del inventario con su precio y existencias.
-// ============================================================================
 export class Producto {
     id: number;
     categoria_id?: number;

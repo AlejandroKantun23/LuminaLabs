@@ -2,9 +2,7 @@ import { Router } from 'express';
 import { categoriaController } from '../controllers/CategoriaController';
 import { autenticar, soloAdmin } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE CATEGORÍAS. Prefijo montado en index.ts: /api/categorias
-// ============================================================================
 const router = Router();
 
 // GET /api/categorias -> lista pública (la usa la app móvil)

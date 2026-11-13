@@ -3,12 +3,10 @@ import { pool } from '../config/database';
 import { Producto } from '../models/Producto';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE PRODUCTOS / INVENTARIO: El catálogo es público (lo usa la
 // app móvil); el inventario completo, el alta, la edición y los ajustes de
 // existencias son solo para el personal. Borrar es una baja lógica (activo=0)
 // para no perder el historial de ventas y pedidos.
-// ============================================================================
 const CAMPOS_EDITABLES = ['categoria_id', 'sku', 'nombre', 'descripcion', 'precio', 'stock', 'stock_minimo', 'codigo_barras', 'imagen_url', 'activo'];
 const COLUMNAS_PUBLICAS = 'p.id, p.sku, p.codigo_barras, p.nombre, p.descripcion, p.categoria_id, c.nombre AS categoria, p.precio, p.stock, p.imagen_url';
 

@@ -2,9 +2,7 @@ import { Router } from 'express';
 import { authController } from '../controllers/AuthController';
 import { autenticar } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE AUTENTICACIÓN. Prefijo montado en index.ts: /api/auth
-// ============================================================================
 const router = Router();
 
 // POST /api/auth/register -> registro de cliente (teléfono opcional)

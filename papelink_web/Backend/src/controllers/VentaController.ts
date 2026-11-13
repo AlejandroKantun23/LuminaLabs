@@ -5,11 +5,9 @@ import { AuthRequest } from '../middleware/auth';
 import { cargarLineas } from '../utils/lineas';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE VENTAS (POS): Cobros directos en el mostrador por parte del
 // empleado o el dueño. El trigger de la base descuenta el stock y rechaza la
 // venta si no alcanzan las existencias.
-// ============================================================================
 class VentaController {
 
     // MÉTODO: Registrar venta. Body: { metodo_pago, items: [{ producto_id, cantidad }] }

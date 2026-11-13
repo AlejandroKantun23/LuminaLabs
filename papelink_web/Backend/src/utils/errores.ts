@@ -1,10 +1,8 @@
 import { Response } from 'express';
 
-// ============================================================================
 // ERRORES: Un error "esperado" (ErrorHttp) lleva su código HTTP y su mensaje.
 // responderError traduce también los errores de MySQL a mensajes entendibles
 // (por ejemplo, el "Stock insuficiente" que lanzan los triggers de la BD).
-// ============================================================================
 export class ErrorHttp extends Error {
     status: number;
     constructor(status: number, message: string) {

@@ -2,10 +2,8 @@ import { Router } from 'express';
 import { productoController } from '../controllers/ProductoController';
 import { autenticar, soloPersonal, soloAdmin } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE PRODUCTOS / INVENTARIO. Prefijo montado en index.ts: /api/productos
 // (las rutas fijas van antes que /:id para que no se confundan)
-// ============================================================================
 const router = Router();
 
 // GET /api/productos?categoria=1&q=lapiz -> catálogo público con stock

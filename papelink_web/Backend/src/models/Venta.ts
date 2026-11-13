@@ -1,7 +1,5 @@
-// ============================================================================
 // MODELO DE VENTA: Un cobro hecho en el mostrador (POS). Se arma desde la
 // vista v_ventas. Si salió de un apartado, trae pedido_id; si no, es directa.
-// ============================================================================
 export class Venta {
     id: number;
     ticket: string;                   // T-000123

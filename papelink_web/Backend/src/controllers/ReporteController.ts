@@ -2,10 +2,8 @@ import { Request, Response } from 'express';
 import { pool } from '../config/database';
 import { responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE REPORTES: Los números de las tarjetas del panel de inicio
 // (ventas del día, ticket promedio, apartados por estado y estado del stock).
-// ============================================================================
 class ReporteController {
 
     public resumenDia = async (req: Request, res: Response): Promise<void> => {

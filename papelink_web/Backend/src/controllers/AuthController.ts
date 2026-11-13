@@ -7,10 +7,8 @@ import { Usuario } from '../models/Usuario';
 import { AuthRequest } from '../middleware/auth';
 import { ErrorHttp, responderError } from '../utils/errores';
 
-// ============================================================================
 // CONTROLADOR DE AUTENTICACIÓN: Registro de clientes (app móvil) e inicio de
 // sesión (app móvil y panel web). El password se guarda siempre con hash.
-// ============================================================================
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Firma el token de sesión con los datos mínimos que necesitan las rutas

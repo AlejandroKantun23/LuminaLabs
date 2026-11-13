@@ -2,9 +2,7 @@ import { Router } from 'express';
 import { ventaController } from '../controllers/VentaController';
 import { autenticar, soloPersonal } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE VENTAS (POS, personal). Prefijo montado en index.ts: /api/ventas
-// ============================================================================
 const router = Router();
 router.use(autenticar, soloPersonal);
 

@@ -1,11 +1,9 @@
 import { PoolConnection } from 'mysql2/promise';
 import { ErrorHttp } from './errores';
 
-// ============================================================================
 // LÍNEAS DE UN PEDIDO O VENTA: El cliente solo manda { producto_id, cantidad }.
 // El PRECIO se lee siempre de la base de datos (nunca del cliente), y el total
 // se calcula aquí, para que nadie pueda alterar un precio desde la app.
-// ============================================================================
 export interface Linea { producto_id: number; cantidad: number; precio_unitario: number; }
 
 export async function cargarLineas(conn: PoolConnection, items: any): Promise<{ lineas: Linea[]; total: number }> {

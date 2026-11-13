@@ -2,9 +2,7 @@ import { Router } from 'express';
 import { pedidoController } from '../controllers/PedidoController';
 import { autenticar, soloRol, soloPersonal } from '../middleware/auth';
 
-// ============================================================================
 // RUTAS DE PEDIDOS (APARTADOS). Prefijo montado en index.ts: /api/pedidos
-// ============================================================================
 const router = Router();
 router.use(autenticar);
 

@@ -2,10 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/seguridad';
 
-// ============================================================================
 // AUTENTICACIÓN: Revisa que cada petición traiga su token de sesión y que el
 // rol (cliente / empleado / admin) tenga permiso para entrar a la ruta.
-// ============================================================================
 export interface AuthRequest extends Request {
     user?: { id: number; rol: 'cliente' | 'empleado' | 'admin'; nombre: string };
 }
