@@ -9,7 +9,7 @@ export const pool = mysql.createPool({
     host: 'localhost',              // Tu servidor local
     port: 3307,                     // Puerto de tu MySQL (3306 es el normal, tú usas 3307)
     user: 'root',                   // Tu usuario de HeidiSQL
-    password: 'root',      // Tu contraseña de HeidiSQL (vacío si no tiene)
+    password: 'Gatoss.142678',      // Tu contraseña de HeidiSQL (vacío si no tiene)
     database: 'papeleria',          // La BD que crea database/papeleria.sql
     waitForConnections: true,
     connectionLimit: 10,
