@@ -1,8 +1,10 @@
+import 'dotenv/config';
 import express, { Application } from 'express';
 import cors from 'cors';
 import path from 'path';
+import { probarConexion } from './config/database';
+import { rutaNoEncontrada, manejarErrores, traducirErrorMySQL } from './utils/errores';
 
-// Importación de las colecciones de rutas del backend
 import authRoutes from './routes/authRoutes';
 import usuarioRoutes from './routes/usuarioRoutes';
 import categoriaRoutes from './routes/categoriaRoutes';
@@ -26,7 +28,7 @@ class Server {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: false }));
 
-        // MULTIMEDIA: Carpeta física donde se guardan las imágenes de los productos
+        // carpeta donde se guardan las imágenes de los productos
         this.app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
     }
 
@@ -39,14 +41,24 @@ class Server {
         this.app.use('/api/pedidos', pedidoRoutes);
         this.app.use('/api/ventas', ventaRoutes);
         this.app.use('/api/reportes', reporteRoutes);
+
+        // siempre al final: rutas que no existen y errores que nadie atrapó
+        this.app.use(rutaNoEncontrada);
+        this.app.use(manejarErrores);
     }
 
-    start(): void {
+    async start(): Promise<void> {
+        try {
+            await probarConexion();
+        } catch (error) {
+            const motivo = traducirErrorMySQL(error)?.message ?? error;
+            console.error('No se pudo iniciar: MySQL no respondió.', motivo);
+            process.exit(1);
+        }
         this.app.listen(this.app.get('port'), () => {
-            console.log(`Backend de Papelink corriendo en http://localhost:${this.app.get('port')} 🚀`);
+            console.log(`Backend de Papelink corriendo en http://localhost:${this.app.get('port')}`);
         });
     }
 }
 
-const server = new Server();
-server.start();
+new Server().start();

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
+import { emailExiste, crearUsuario } from '../repositories/UsuarioRepositories';
+import { validarNombre, validarEmail, validarPassword, validarTelefono } from '../utils/validaciones';
 import { pool } from '../config/database';
 import { Usuario } from '../models/Usuario';
 import { AuthRequest } from '../middleware/auth';
@@ -20,17 +21,19 @@ class UsuarioController {
 
     public create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { nombre, email, password, telefono, rol = 'empleado' } = req.body;
-            if (!nombre?.trim() || !email || typeof password !== 'string' || password.length < 8)
-                throw new ErrorHttp(400, 'nombre, email y contraseña (mínimo 8 caracteres) son obligatorios');
-            if (!['cliente', 'empleado', 'admin'].includes(rol)) throw new ErrorHttp(400, 'Rol inválido');
-
-            const hash = await bcrypt.hash(password, 10);
-            const [ins]: any = await pool.query(
-                'INSERT INTO usuarios (nombre, email, password, telefono, rol) VALUES (?, ?, ?, ?, ?)',
-                [nombre.trim(), String(email).toLowerCase().trim(), hash, telefono || null, rol]
-            );
-            res.status(201).json({ message: 'Usuario creado', id: ins.insertId });
+            const nombre = validarNombre(req.body?.nombre);
+            const email = validarEmail(req.body?.email);
+            const password = validarPassword(req.body?.password);
+            const telefono = validarTelefono(req.body?.telefono);
+            const rol = req.body?.rol ?? 'empleado';
+            if (!['cliente', 'empleado', 'admin'].includes(rol)) {
+                throw new ErrorHttp(400, 'El rol debe ser cliente, empleado o admin', 'ROL_INVALIDO');
+            }
+            if (await emailExiste(email)) {
+                throw new ErrorHttp(409, 'Ese correo ya está registrado', 'EMAIL_YA_REGISTRADO');
+            }
+            const id = await crearUsuario({ nombre, email, password, telefono, rol });
+            res.status(201).json({ message: 'Usuario creado', id });
         } catch (error) {
             responderError(res, error, 'Error al crear usuario');
         }

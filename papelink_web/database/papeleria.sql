@@ -263,12 +263,23 @@ INSERT INTO categorias (nombre, descripcion) VALUES
  ('Escolar','Tijeras, pegamento y útiles escolares');
 
 INSERT INTO usuarios (nombre,email,password,telefono,rol) VALUES
- ('Dueño','admin@papeleria.com','$2b$10$5B7PXw4KdwiGIyOC96xhl.kme3Tzk7N0wLKFvrBaEgpvpP8Kkk1Se',NULL,'admin'),
- ('Caja 1','empleado@papeleria.com','$2b$10$W8oytSwc1N.uK8Nn0QZIieu2CLfZ73ThlprDxCDU6PB01x.RAs6Ai',NULL,'empleado'),
- ('Carlos','carlos@correo.com','$2b$10$fwsQJq9AIuYFFxBIZI1vM.uz2ErOA0la1BOKwjddObLrN8LOFFUkq',NULL,'cliente');
+ ('Dueño','admin@papeleria.com',SHA2('12345',256),NULL,'admin'),
+ ('Caja 1','empleado@papeleria.com',SHA2('12345',256),NULL,'empleado'),
+ ('Carlos','carlos@correo.com',SHA2('12345',256),NULL,'cliente');
+
 
 INSERT INTO productos (categoria_id,sku,nombre,descripcion,precio,stock,stock_minimo,codigo_barras) VALUES
  (1,'CUA-100R','Cuaderno profesional','Raya, 100 hojas',45.00,48,20,'750000000001'),
  (2,'LAP-HB02','Lápiz de grafito HB','No. 2',6.00,8,15,'750000000002'),
  (4,'MAR-12C','Marcadores de colores','Estuche de 12 piezas',68.00,0,8,'750000000003'),
  (5,'TIJ-13CM','Tijeras escolares','Punta redonda',25.00,12,6,'750000000004');
+
+
+
+-- Comando Para cambios de las contraseñas de los usuario:
+-- 1. Desactivar el modo seguro para esta sesión
+-- SET SQL_SAFE_UPDATES = 0;
+-- 2. Ejecutar tu actualización masiva
+-- UPDATE usuarios SET password = SHA2('12345', 256);
+-- 3. Volver a activar el modo seguro por seguridad
+-- SET SQL_SAFE_UPDATES = 1;
