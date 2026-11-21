@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/screens/main_shell_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
 import 'package:frontend/screens/recoverypassword_screen.dart';
 import 'package:frontend/screens/contactos_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+     MaterialPageRoute(builder: (context) => const MainShellScreen()),
     );
   }
 
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => const HomeScreen(),
+                                              builder: (context) => const MainShellScreen(),
                                             ),
                                           );
                                         },
