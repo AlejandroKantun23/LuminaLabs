@@ -17,14 +17,7 @@ class _CartScreenState extends State<CartScreen> {
     final carrito = CarritoService.instance;
     return Scaffold(
       backgroundColor: const Color(0xFFF6F8FA),
-      appBar: HomeHeader(
-        onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-        },
-      ),
+      appBar: HomeHeader(),
       body: AnimatedBuilder(
         animation: carrito,
         builder: (context, _) {

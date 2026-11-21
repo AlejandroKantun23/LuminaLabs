@@ -56,8 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       // Mantenemos el botón azul flotante abajo al centro con el carrito
-      floatingActionButton: const HomeCartFab(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      
     );
   }
 }
