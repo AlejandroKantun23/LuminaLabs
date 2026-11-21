@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express, { Application } from 'express';
+import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { probarConexion } from './config/database';
@@ -14,7 +14,7 @@ import ventaRoutes from './routes/ventaRoutes';
 import reporteRoutes from './routes/reporteRoutes';
 
 class Server {
-    public app: Application;
+    public app: express.Application;
 
     constructor() {
         this.app = express();
@@ -55,8 +55,10 @@ class Server {
             console.error('No se pudo iniciar: MySQL no respondió.', motivo);
             process.exit(1);
         }
-        this.app.listen(this.app.get('port'), () => {
-            console.log(`Backend de Papelink corriendo en http://localhost:${this.app.get('port')}`);
+
+        const port = Number(this.app.get('port'));
+        this.app.listen(port, '0.0.0.0', () => {
+            console.log(`Backend de Papelink corriendo en http://localhost:${port}`);
         });
     }
 }

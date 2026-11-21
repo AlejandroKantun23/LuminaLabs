@@ -1,17 +1,18 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/services/usuario_service.dart';
 
-class SplashScreen extends StatefulWidget{
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState()=> _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin{
-late AnimationController _progreso;
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _progreso;
 
   @override
   void initState() {
@@ -22,13 +23,30 @@ late AnimationController _progreso;
       duration: const Duration(milliseconds: 1800),
     )..forward();
 
-    Timer(const Duration(milliseconds: 2000), (){
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => LoginScreen())));
-    });
+    _iniciarApp();
+  }
+
+  Future<void> _iniciarApp() async {
+    // Lanza la verificación de sesión en paralelo con la animación del splash
+    final sesionFuture =
+        UsuarioService.verificarSesion().catchError((_) => null);
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+    final usuario = await sesionFuture;
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            usuario != null ? const HomeScreen() : const LoginScreen(),
+      ),
+    );
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _progreso.dispose();
     super.dispose();
   }
@@ -41,26 +59,36 @@ late AnimationController _progreso;
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.edit, color: Color.fromARGB(255, 60, 160, 226), size: 120,),
-            SizedBox(height: 30,),
-            Text("Papelink", style: TextStyle(color: Color.fromARGB(255, 60, 160, 226), fontSize: 50, fontWeight: FontWeight.bold),),
-            SizedBox(height: 30,),
+            const Icon(
+              Icons.edit,
+              color: Color.fromARGB(255, 60, 160, 226),
+              size: 120,
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Papelink',
+              style: TextStyle(
+                color: Color.fromARGB(255, 60, 160, 226),
+                fontSize: 50,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 30),
             SizedBox(
               width: 350,
               child: AnimatedBuilder(
-                animation: _progreso, 
+                animation: _progreso,
                 builder: (context, child) {
                   return LinearProgressIndicator(
                     value: _progreso.value,
-                    color: Color.fromARGB(255, 60, 160, 226),
-                    backgroundColor: Color.fromARGB(255, 64, 98, 121),
+                    color: const Color.fromARGB(255, 60, 160, 226),
+                    backgroundColor: const Color.fromARGB(255, 64, 98, 121),
                     minHeight: 10,
                     borderRadius: BorderRadius.circular(10),
                   );
-                }
+                },
               ),
-            )
-            //CircularProgressIndicator(color: Color.fromARGB(255, 60, 160, 226),),
+            ),
           ],
         ),
       ),

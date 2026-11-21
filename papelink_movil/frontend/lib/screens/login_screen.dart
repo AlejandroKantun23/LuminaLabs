@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/contactos_screen.dart';
 import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/screens/recoverypassword_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
-import 'package:frontend/screens/recoverypassword_screen.dart';
-import 'package:frontend/screens/contactos_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,9 +13,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _correoController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _ocultarPassword = true;
+  final _formKey = GlobalKey<FormState>();
+  final _correoController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
 
   static const Color azul = Color(0xFF0A7FC4);
 
@@ -26,51 +28,69 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _iniciarSesion() {
-    final correo = _correoController.text.trim();
-    final password = _passwordController.text;
+  Future<void> _iniciarSesion() async {
+    FocusScope.of(context).unfocus();
 
-    if (correo.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Llena todos los campos')),
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await UsuarioService.login(
+        correo: _correoController.text.trim(),
+        password: _passwordController.text,
       );
-      return;
-    }
 
-    final usuario = UsuarioService.iniciarSesion(correo, password);
-
-    if (usuario == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correo o contraseña incorrectos')),
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
-      return;
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.mensaje),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Ocurrió un error inesperado. Intenta de nuevo.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(//boton provisional pa no hacer la cuenta 
-                                      floatingActionButton: FloatingActionButton.extended(
-                                        onPressed: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const HomeScreen(),
-                                            ),
-                                          );
-                                        },
-                                        backgroundColor: azul,
-                                        foregroundColor: Colors.white,
-                                        elevation: 6,
-                                        icon: const Icon(Icons.explore_outlined),
-                                        label: const Text('Modo Invitado', style: TextStyle( fontWeight: FontWeight.bold),),
-                                      ),
-      //codigo normal
+    return Scaffold(
+      // Botón provisional para entrar sin cuenta
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isLoading
+            ? null
+            : () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                );
+              },
+        backgroundColor: azul,
+        foregroundColor: Colors.white,
+        elevation: 6,
+        icon: const Icon(Icons.explore_outlined),
+        label: const Text(
+          'Modo Invitado',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -98,184 +118,258 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Encabezado: logo + nombre
-                    Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: azul,
-                            borderRadius: BorderRadius.circular(10),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Encabezado: logo + nombre
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: azul,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.edit, color: Colors.white),
                           ),
-                          child: const Icon(Icons.edit, color: Colors.white),
-                        ),
-                        const SizedBox(width: 10),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Papelink',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          const SizedBox(width: 10),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Papelink',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Tu papelería a un toque',
-                              style: TextStyle(fontSize: 11, color: azul),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
+                              Text(
+                                'Tu papelería a un toque',
+                                style: TextStyle(fontSize: 11, color: azul),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
 
-                    // Título
-                    const Row(
-                      children: [
-                        Icon(Icons.shopping_bag_outlined,
-                            size: 14, color: azul),
-                        SizedBox(width: 4),
-                        Text(
-                          'BIENVENIDO',
-                          style: TextStyle(
-                            fontSize: 11,
+                      // Título
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 14,
                             color: azul,
-                            fontWeight: FontWeight.bold,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Inicia sesión',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Ingresa para reservar tus productos y consultar el estado de tus reservas.',
-                      style: TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Correo
-                    const Text(
-                      'Correo electrónico',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _correoController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.email_outlined),
-                        hintText: 'nombre@correo.com',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Contraseña
-                    const Text(
-                      'Contraseña',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: _ocultarPassword,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        hintText: 'Ingresa tu contraseña',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _ocultarPassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                          SizedBox(width: 4),
+                          Text(
+                            'BIENVENIDO',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: azul,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _ocultarPassword = !_ocultarPassword;
-                            });
-                          },
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Inicia sesión',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const RecoveryPasswordScreen(),
-                           ),
-                          );
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Ingresa para reservar tus productos y consultar el estado de tus reservas.',
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Correo
+                      const Text(
+                        'Correo electrónico',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _correoController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        enabled: !_isLoading,
+                        validator: (value) {
+                          final correo = value?.trim() ?? '';
+                          if (correo.isEmpty) {
+                            return 'Ingresa tu correo electrónico';
+                          }
+                          if (!correo.contains('@') || !correo.contains('.')) {
+                            return 'Ingresa un correo válido';
+                          }
+                          return null;
                         },
-                        child: const Text(
-                          '¿Olvidaste tu contraseña?',
-                          style: TextStyle(color: azul, fontSize: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Botón iniciar sesión
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: _iniciarSesion,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: azul,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          hintText: 'nombre@correo.com',
+                          border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Iniciar sesión  →',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Contraseña
+                      const Text('Contraseña', style: TextStyle(fontSize: 12)),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        textInputAction: TextInputAction.done,
+                        enabled: !_isLoading,
+                        onFieldSubmitted: (_) {
+                          if (!_isLoading) _iniciarSesion();
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu contraseña';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintText: 'Ingresa tu contraseña',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RecoveryPasswordScreen(),
+                                    ),
+                                  );
+                                },
+                          child: const Text(
+                            '¿Olvidaste tu contraseña?',
+                            style: TextStyle(color: azul, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
 
-                    // Crear cuenta
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          '¿No tienes cuenta?',
+                      // Botón iniciar sesión
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _iniciarSesion,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: azul,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: azul.withValues(alpha: 0.6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Iniciar sesión  →',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Crear cuenta
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '¿No tienes cuenta?',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegisterScreen(),
+                                      ),
+                                    );
+                                  },
+                            child: const Text(
+                              'Crear cuenta',
+                              style: TextStyle(
+                                color: azul,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+
+                      // Contacto
+                      const Center(
+                        child: Text(
+                          '¿Tienes dudas?',
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
-                          },
+                      ),
+                      Center(
+                        child: TextButton(
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ContactosScreen(),
+                                    ),
+                                  );
+                                },
                           child: const Text(
-                            'Crear cuenta',
+                            'Contáctanos',
                             style: TextStyle(
                               color: azul,
                               fontSize: 12,
@@ -283,38 +377,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    const Divider(),
-
-                    // Contacto
-                    const Center(
-                      child: Text(
-                        '¿Tienes dudas?',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
-                    ),
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ContactosScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Contáctanos',
-                          style: TextStyle(
-                            color: azul,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

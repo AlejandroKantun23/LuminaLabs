@@ -191,18 +191,6 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
             {resumenHoy.articulosVendidosHoy} artículos vendidos hoy
           </span>
         </div>
-
-        <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
-          <span className="text-[11px] text-sky-800 font-bold block mb-1">
-            Ticket promedio
-          </span>
-          <span className="text-2xl font-extrabold text-slate-900">
-            ${resumenHoy.ticketPromedioHoy.toFixed(2)}
-          </span>
-          <span className="text-[10px] text-sky-600 font-medium block mt-1">
-            MXN por venta de hoy
-          </span>
-        </div>
       </div>
 
       {error && (
