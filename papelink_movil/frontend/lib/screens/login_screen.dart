@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/contactos_screen.dart';
-import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/screens/main_shell_screen.dart';
 import 'package:frontend/screens/recoverypassword_screen.dart';
 import 'package:frontend/screens/register_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const MainShellScreen()),
       );
     } on AuthException catch (e) {
       if (!mounted) return;
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
             : () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  MaterialPageRoute(builder: (context) => const MainShellScreen()),
                 );
               },
         backgroundColor: azul,
