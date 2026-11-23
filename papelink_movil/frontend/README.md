@@ -1,17 +1,19 @@
-# frontend
+# Papelink - Móvil
 
-A new Flutter project.
+Apartado donde se maneja la versión móvil de Papelink
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+En esta aplicación se quiere manejar una tienda virtual que se controla mediante pedidos de artículos disponibles en la papelería, así poder ir directamente a comprar sin necesidad de una fila, aunque solo maneja pagos directos en físico (solo en la papelería).
+```
+papelink_movil/
+├── frontend/                
+│   └── lib/
+│       ├── config/          Api para la conexión a la BDD
+│       ├── models/          Usuario, Producto como modelos
+│       ├── screens/         cart, contactos, home, login, newpass, profile, register, settings y splash
+│       ├── services/        manejo de funciones para el carrito, login y vista de los productos, ademas del codigo de verificación
+│       └── widgets/         pequeñas secciones para reutilizar a lo largo e las distintas pantallas
+```
+## Conexión a BDD
+| host | port | user | password | database |
+|---|---|---|---|---|
+| localhost | 3307 | root | (la de tu HeidiSQL) | papeleria |
