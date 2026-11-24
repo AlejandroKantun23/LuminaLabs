@@ -5,7 +5,12 @@ import 'package:frontend/services/carrito_service.dart';
 import 'product_card.dart';
 
 class ProductGrid extends StatelessWidget {
-  const ProductGrid({super.key});
+  const ProductGrid({
+    super.key,
+    required this.productos,
+  });
+
+  final List<Producto> productos;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +26,9 @@ class ProductGrid extends StatelessWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),
-        itemCount: Producto.catalogo.length,
+        itemCount: productos.length,
         itemBuilder: (context, index) {
-          final product = Producto.catalogo[index];
+          final product = productos[index];
           return ProductCard(
             product: product,
             canAdd: carrito.puedeAgregar(product),
