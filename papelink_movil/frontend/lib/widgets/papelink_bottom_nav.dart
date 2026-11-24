@@ -60,6 +60,11 @@ class PapelinkBottomNav extends StatelessWidget {
               label: 'Carrito',
             ),
             const NavigationDestination(
+              icon: Icon(Icons.receipt_long_outlined, color: _inactiveGrey),
+              selectedIcon: Icon(Icons.receipt_long_rounded, color: _activeBlue),
+              label: 'Pedidos',
+            ),
+            const NavigationDestination(
               icon: Icon(Icons.person_outline_rounded, color: _inactiveGrey),
               selectedIcon: Icon(Icons.person_rounded, color: _activeBlue),
               label: 'Perfil',
