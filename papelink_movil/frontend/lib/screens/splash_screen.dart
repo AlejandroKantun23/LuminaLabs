@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/main_shell_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -27,9 +27,10 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _iniciarApp() async {
-    // Lanza la verificación de sesión en paralelo con la animación del splash
-    final sesionFuture =
-        UsuarioService.verificarSesion().catchError((_) => null);
+    // Si el servidor tarda más de 3 segundos, devuelve null y sigue al login
+    final sesionFuture = UsuarioService.verificarSesion()
+        .timeout(const Duration(seconds: 3), onTimeout: () => null)
+        .catchError((_) => null);
 
     await Future.delayed(const Duration(milliseconds: 2000));
     final usuario = await sesionFuture;
@@ -40,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen>
       context,
       MaterialPageRoute(
         builder: (context) =>
-            usuario != null ? const HomeScreen() : const LoginScreen(),
+            usuario != null ? const MainShellScreen() : const LoginScreen(),
       ),
     );
   }
