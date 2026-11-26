@@ -41,6 +41,7 @@ export interface VentaApi {
   metodo_pago: Metodo;
   atendio: string;
   articulos: number;
+  articulos_resumen?: string;
   pedido_id: number | null;
   detalle?: Array<{
     producto_id: number;
@@ -200,3 +201,5 @@ export const cobrarPedido = (id: number, metodo_pago: Metodo) =>
     body: { metodo_pago },
   });
 export const getResumenDia = () => api<ResumenDia>("/reportes/resumen-dia");
+
+

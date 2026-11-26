@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getVentas } from "../api/client";
+import { getVenta, getVentas } from "../api/client";
 import type { VentaApi } from "../api/client";
+import { DetalleVentaModal } from "../components/modals/detalleventa";
 
 interface Props {
   refreshKey?: number;
@@ -26,7 +27,7 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
     [],
   );
 
-  const [ventas, setVentas] = useState<any[]>([]);
+  const [ventas, setVentas] = useState<VentaApi[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
@@ -35,6 +36,12 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
   const [dateTo, setDateTo] = useState<string>(todayISO);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 6;
+
+  // Estados para la ventana emergente de detalle de venta
+  const [selectedSale, setSelectedSale] = useState<VentaApi | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
+  const [detailError, setDetailError] = useState<string>("");
 
   useEffect(() => {
     let active = true;
@@ -64,22 +71,41 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
     };
   }, [refreshKey]);
 
-  const getRawDate = (v: any): string | undefined => v.fecha_venta ?? v.fecha;
+  const handleVerDetalle = async (venta: VentaApi) => {
+    onSelectVenta?.(venta);
+    setSelectedSale(venta);
+    setIsDetailOpen(true);
+    setLoadingDetail(true);
+    setDetailError("");
 
-  const getVentaDateISO = (v: any): string => {
-    const raw = getRawDate(v);
+    try {
+      const ventaCompleta = await getVenta(venta.id);
+      setSelectedSale(ventaCompleta);
+    } catch (err: unknown) {
+      setDetailError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo cargar el detalle de la venta.",
+      );
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const getVentaDateISO = (v: VentaApi): string => {
+    const raw = v.fecha_venta;
     if (!raw) return todayISO;
     const parsed = new Date(raw);
     if (isNaN(parsed.getTime())) return raw.slice(0, 10);
     return getLocalISODate(parsed);
   };
 
-  const formatIdentificador = (v: any): string => {
+  const formatIdentificador = (v: VentaApi): string => {
     return `V-${String(v.id).padStart(5, "0")}`;
   };
 
-  const formatFechaHora = (v: any): { fecha: string; hora: string } => {
-    const raw = getRawDate(v);
+  const formatFechaHora = (v: VentaApi): { fecha: string; hora: string } => {
+    const raw = v.fecha_venta;
     if (!raw) return { fecha: todayDisplay, hora: "--:-- h" };
     const parsed = new Date(raw);
     if (isNaN(parsed.getTime())) return { fecha: raw, hora: "" };
@@ -189,6 +215,18 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </span>
           <span className="text-[10px] text-sky-600 font-medium block mt-1">
             {resumenHoy.articulosVendidosHoy} artículos vendidos hoy
+          </span>
+        </div>
+
+        <div className="bg-gradient-to-br from-white to-sky-50 border border-sky-200/70 p-5 rounded-2xl shadow-xs">
+          <span className="text-[11px] text-sky-800 font-bold block mb-1">
+            Ticket promedio
+          </span>
+          <span className="text-2xl font-extrabold text-slate-900">
+            ${resumenHoy.ticketPromedioHoy.toFixed(2)}
+          </span>
+          <span className="text-[10px] text-sky-600 font-medium block mt-1">
+            MXN por venta de hoy
           </span>
         </div>
       </div>
@@ -342,7 +380,7 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
                       <td className="py-4 text-right">
                         <button
                           type="button"
-                          onClick={() => onSelectVenta && onSelectVenta(venta)}
+                          onClick={() => handleVerDetalle(venta)}
                           className="text-xs text-slate-700 hover:text-sky-700 underline cursor-pointer font-medium"
                         >
                           Ver detalle
@@ -394,6 +432,19 @@ export const Ventas: React.FC<Props> = ({ refreshKey = 0, onSelectVenta }) => {
           </div>
         </div>
       </div>
+
+      {/* Ventana emergente de detalle de venta */}
+      <DetalleVentaModal
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedSale(null);
+          setDetailError("");
+        }}
+        sale={selectedSale}
+        loading={loadingDetail}
+        error={detailError}
+      />
     </div>
   );
 };
