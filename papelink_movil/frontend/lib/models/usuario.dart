@@ -2,12 +2,14 @@ class Usuario {
   final int id;
   final String nombre;
   final String email;
+  final String password;
   final String? telefono;
   final String rol;
 
   const Usuario({
     required this.id,
     required this.nombre,
+    required this.password,
     required this.email,
     this.telefono,
     required this.rol,
@@ -22,6 +24,7 @@ class Usuario {
       id: rawId is int ? rawId : int.tryParse(rawId.toString()) ?? 0,
       nombre: (json['nombre'] ?? '').toString(),
       email: (json['email'] ?? '').toString(),
+      password: (json['password'] ?? '').toString(),
       telefono: json['telefono']?.toString(),
       rol: (json['rol'] ?? 'cliente').toString(),
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/usuario_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -46,12 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(content: Text('Cuenta creada correctamente')),
       );
 
-      // Como tu backend devuelve token al registrarse, entra directo a HomeScreen
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
-      );
+      Navigator.pop(context);
     } on AuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

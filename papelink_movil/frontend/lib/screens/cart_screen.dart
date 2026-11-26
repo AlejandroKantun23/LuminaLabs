@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/producto.dart';
 import 'package:frontend/services/carrito_service.dart';
 import 'package:frontend/widgets/home_header.dart';
-import 'package:frontend/screens/home_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

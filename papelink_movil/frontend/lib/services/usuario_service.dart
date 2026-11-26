@@ -80,7 +80,7 @@ class UsuarioService {
     }
   }
 
-  static Future<Usuario> register({
+  static Future<void> register({
     required String nombre,
     required String email,
     required String password,
@@ -106,22 +106,11 @@ class UsuarioService {
           )
           .timeout(ApiConfig.timeout);
 
+      if (response.statusCode == 201) return;
+
       final Map<String, dynamic> body = response.body.isNotEmpty
           ? jsonDecode(response.body) as Map<String, dynamic>
           : {};
-
-      if (response.statusCode == 201) {
-        final String? token = body['token'] as String?;
-        final dynamic userJson = body['user'];
-
-        if (token == null || token.isEmpty || userJson is! Map<String, dynamic>) {
-          throw const AuthException('Respuesta inválida del servidor.');
-        }
-
-        final usuario = Usuario.fromJson(userJson);
-        await SessionService.guardarSesion(token: token, usuario: usuario);
-        return usuario;
-      }
 
       if (response.statusCode >= 400 && response.statusCode < 500) {
         final mensajeBackend = body['message'] ?? body['error'];
