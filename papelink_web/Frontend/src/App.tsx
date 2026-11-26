@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { crearVenta, setToken } from "./api/client";
-import type { ProductoApi } from "./api/client";
+import React, { useEffect, useState } from "react";
+import { crearVenta, getResumenDia, setToken } from "./api/client";
+import type { Metodo, Usuario } from "./api/client";
 import { Splash } from "./pages/splash";
 import { Login } from "./pages/login";
 import { InicioPOS } from "./pages/InicioPOS";
@@ -8,23 +8,24 @@ import type { CartItem } from "./pages/InicioPOS";
 import { Inventario } from "./pages/inventario";
 import { Ventas } from "./pages/ventas";
 import { Pedidos } from "./pages/pedidos";
+import { CorteCaja } from "./pages/Corte";
+import { Navbar } from "./components/navbar";
 import { Sidebar } from "./components/sidebar";
 import { EstadoNegocioModal } from "./components/modals/agregarventa";
-import { EstadoInventarioModal } from "./components/modals/agregarinventario";
 
 export const App: React.FC = () => {
   const [screen, setScreen] = useState<"splash" | "login" | "dashboard">(
     "splash",
   );
+  const [currentUser, setCurrentUser] = useState<Usuario | null>(null);
   const [currentView, setCurrentView] = useState<string>("inicio");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCobroOpen, setIsCobroOpen] = useState(false);
-  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
-  const [inventoryProduct, setInventoryProduct] = useState<ProductoApi | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [saleError, setSaleError] = useState("");
   const [isSaleSubmitting, setIsSaleSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.price * item.qty,
@@ -32,7 +33,29 @@ export const App: React.FC = () => {
   );
   const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
 
-  const handleConfirmSale = async () => {
+  // Actualizar el contador de pedidos activos de la app móvil en la pestaña F2
+  useEffect(() => {
+    if (screen !== "dashboard") return;
+    let active = true;
+    getResumenDia()
+      .then((summary) => {
+        if (!active) return;
+        const estados = summary.pedidos_por_estado ?? {};
+        const activos =
+          Number(estados.pendiente ?? 0) +
+          Number(estados.confirmado_apartado ?? 0) +
+          Number(estados.listo_en_tienda ?? 0);
+        setPendingOrdersCount(activos);
+      })
+      .catch(() => {
+        // Silencioso para no interrumpir la operación en caja
+      });
+    return () => {
+      active = false;
+    };
+  }, [screen, refreshKey, currentView]);
+
+  const handleConfirmSale = async (metodo: Metodo) => {
     if (!cart.length || isSaleSubmitting) return false;
     setSaleError("");
     setIsSaleSubmitting(true);
@@ -42,7 +65,7 @@ export const App: React.FC = () => {
           producto_id: item.productId,
           cantidad: item.qty,
         })),
-        "efectivo",
+        metodo,
       );
       setCart([]);
       setRefreshKey((key) => key + 1);
@@ -61,96 +84,86 @@ export const App: React.FC = () => {
 
   const handleLogout = () => {
     setToken(null);
+    setCurrentUser(null);
     setCart([]);
+    setIsCobroOpen(false);
     setScreen("login");
   };
 
-  if (screen === "splash")
+  if (screen === "splash") {
     return <Splash onFinish={() => setScreen("login")} />;
-  if (screen === "login")
+  }
+
+  if (screen === "login") {
     return (
       <Login
-        onLogin={() => {
+        onLogin={(user) => {
+          setCurrentUser(user);
           setScreen("dashboard");
           setCurrentView("inicio");
+          setRefreshKey((key) => key + 1);
         }}
       />
     );
+  }
 
   return (
     <div className="min-h-screen bg-[#EAF2F8] flex flex-col font-sans select-none">
-      <header className="h-16 bg-white border-b border-sky-100 px-4 lg:px-8 flex items-center justify-between shadow-xs z-50 shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            aria-label="Abrir menú"
-            className="lg:hidden p-2 text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition cursor-pointer"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <div className="font-bold text-lg text-sky-600 tracking-tight">
-            Papelink
-          </div>
-        </div>
+      {/* Barra superior azul estilo Eleventa */}
+      <Navbar
+        setScreen={handleLogout}
+        onToggleMenu={() => setIsMenuOpen((prev) => !prev)}
+        isMenuOpen={isMenuOpen}
+        userName={
+          currentUser
+            ? `${currentUser.nombre} (${currentUser.rol})`
+            : "Caja Principal"
+        }
+      />
 
-        <button
-          onClick={handleLogout}
-          className="text-xs text-sky-600 hover:text-sky-800 font-semibold underline cursor-pointer"
-        >
-          Cerrar sesión
-        </button>
-      </header>
+      {/* Cinta horizontal de navegación F1 - F5 */}
+      <Sidebar
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        pendingOrdersCount={pendingOrdersCount}
+      />
 
-      <div className="flex flex-1 relative overflow-hidden">
-        <Sidebar
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+      {/* Área de trabajo principal */}
+      <main className="flex-1 overflow-y-auto w-full max-w-[1440px] mx-auto p-4 sm:p-6">
+        {currentView === "inicio" && (
+          <InicioPOS
+            cart={cart}
+            setCart={setCart}
+            onOpenCobro={() => {
+              setSaleError("");
+              setIsCobroOpen(true);
+            }}
+            refreshKey={refreshKey}
+          />
+        )}
 
-        <main className="flex-1 bg-[#EAF2F8] overflow-y-auto w-full p-4 md:p-8">
-          {currentView === "inicio" && (
-            <InicioPOS
-              cart={cart}
-              setCart={setCart}
-              onOpenCobro={() => {
-                setSaleError("");
-                setIsCobroOpen(true);
-              }}
-              refreshKey={refreshKey}
-            />
-          )}
-          {currentView === "inventario" && (
-            <Inventario
-              onOpenAgregarProducto={() => {
-                setInventoryProduct(null);
-                setIsInventoryModalOpen(true);
-              }}
-              onEditProducto={(product) => {
-                setInventoryProduct(product);
-                setIsInventoryModalOpen(true);
-              }}
-              refreshKey={refreshKey}
-            />
-          )}
-          {currentView === "ventas" && <Ventas refreshKey={refreshKey} />}
-          {currentView === "pedidos" && <Pedidos refreshKey={refreshKey} />}
-        </main>
-      </div>
+        {currentView === "pedidos" && (
+          <Pedidos
+            refreshKey={refreshKey}
+            onOrderChanged={() => setRefreshKey((key) => key + 1)}
+          />
+        )}
 
+        {currentView === "inventario" && (
+          <Inventario
+            refreshKey={refreshKey}
+            onInventoryChanged={() => setRefreshKey((key) => key + 1)}
+          />
+        )}
+
+        {currentView === "corte" && <CorteCaja refreshKey={refreshKey} />}
+
+        {currentView === "ventas" && <Ventas refreshKey={refreshKey} />}
+      </main>
+
+      {/* Modal de cobro F12 */}
       <EstadoNegocioModal
         isOpen={isCobroOpen}
         onClose={() => setIsCobroOpen(false)}
@@ -160,23 +173,6 @@ export const App: React.FC = () => {
         error={saleError}
         isSubmitting={isSaleSubmitting}
       />
-
-      {isInventoryModalOpen && (
-        <EstadoInventarioModal
-          key={inventoryProduct?.id ?? "new-product"}
-          isOpen
-          product={inventoryProduct}
-          onClose={() => {
-            setIsInventoryModalOpen(false);
-            setInventoryProduct(null);
-          }}
-          onCreated={() => {
-            setIsInventoryModalOpen(false);
-            setInventoryProduct(null);
-            setRefreshKey((key) => key + 1);
-          }}
-        />
-      )}
     </div>
   );
 };

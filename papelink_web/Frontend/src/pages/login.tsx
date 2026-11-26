@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { login as authenticate, setToken } from "../api/client";
+import type { Usuario } from "../api/client";
 
 interface Props {
-  onLogin: () => void;
+  onLogin: (user: Usuario) => void;
 }
 
 export const Login: React.FC<Props> = ({ onLogin }) => {
@@ -23,7 +24,7 @@ export const Login: React.FC<Props> = ({ onLogin }) => {
         setError("Esta cuenta no tiene acceso al panel administrativo.");
         return;
       }
-      onLogin();
+      onLogin(user);
     } catch (requestError) {
       setError(
         requestError instanceof Error
